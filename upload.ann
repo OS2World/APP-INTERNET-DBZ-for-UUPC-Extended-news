@@ -1,0 +1,38 @@
+I have uploaded to ftp-os2.nmsu.edu, in the incoming directory, 
+UUDBZ003.ZIP.  A DBZ-type of program is usually required for
+those who wish to run NoCEM on their machines.  This is a bug-fix for 
+the logging mechanism, plus some minor improvements for users and
+programmers. 
+
+Also included is a patched version of expire.exe, designed to keep
+expire from trying to delete articles that do not exist, which will
+happen, esp. on machines running NoCEM on spool.
+
+Requires emx runtime and UUPC/Extended 1.12s (it should work with
+1.12r, but it has not been tested).
+
+This is, most likely, the last version I will put out, as it appears
+to have all of the serious bugs fixed.
+
+From the change log:
+
+ * Change log:
+ *
+ * Version .003:
+ *
+ * 11 Aug 97:  Finally got around to fixing the dbz log so that it
+ *             actually writes to "Spool\dbz.log" instead of the
+ *             default "UUPC\extended.log".  Improved logging so
+ *             that debug level 5 will log all of the transactions
+ *             that dbz could/could not make.
+ *
+ * Version .002:
+ *
+ * 9 Aug 97:   Added lock file mechanism so program would not run when
+ *             UUXQT is already running.  Changed and added more exit
+ *             codes:  1 means not found (-x and -m switches only).
+ *             A "not found" for -m really means that it is not missing.
+ *             When using -x, the program now spits back the key and the
+ *             entries!  This is not a minor change, and may break some
+ *             programs.
+

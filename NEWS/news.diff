@@ -1,0 +1,2295 @@
+--- e:\uupc1.12s\source\news\cache.c	Wed Apr 23 19:56:54 1997
++++ cache.c	Sun Aug 17 22:05:00 1997
+@@ -2,20 +2,20 @@
+  *
+  * simple index cache for UUPC news
+  *
+- * Author:  Kai Uwe Rommel <rommel@ars.muc.de>
++ * Author:	Kai Uwe Rommel <rommel@ars.muc.de>
+  * Created: Sun Jan 08 1995
+  */
+ 
+ /*--------------------------------------------------------------------*/
+-/*       Changes Copyright (c) 1989-1997 by Kendra Electronic         */
+-/*       Wonderworks.                                                 */
++/*       Changes Copyright (c) 1989-1997 by Kendra Electronic			 */
++/*       Wonderworks.																 */
+ /*                                                                    */
+-/*       All rights reserved except those explicitly granted by       */
+-/*       the UUPC/extended license agreement.                         */
++/*       All rights reserved except those explicitly granted by		 */
++/*       the UUPC/extended license agreement.								 */
+ /*--------------------------------------------------------------------*/
+ 
+ /*--------------------------------------------------------------------*/
+-/*                          RCS Information                           */
++/*                          RCS Information									 */
+ /*--------------------------------------------------------------------*/
+ 
+ /*
+@@ -70,14 +70,14 @@
+ {
+   if (lseek(cache->file, (long) (index * cache->itemsize), SEEK_SET) == -1)
+   {
+-    printerr("lseek");
+-    return -1;
++	 printerr("lseek");
++	 return -1;
+   }
+ 
+   if (read(cache->file, buffer, cache->itemsize) != (long) cache->itemsize)
+   {
+-    printerr("read");
+-    return -1;
++	 printerr("read");
++	 return -1;
+   }
+ 
+   cache->reads++;
+@@ -90,14 +90,14 @@
+ 
+   if (lseek(cache->file, (long) (index * cache->itemsize), SEEK_SET) == -1)
+   {
+-    printerr("lseek");
+-    return -1;
++	 printerr("lseek");
++	 return -1;
+   }
+ 
+   if (write(cache->file, buffer, cache->itemsize) != (long) cache->itemsize)
+   {
+-    printerr("write");
+-    return -1;
++	 printerr("write");
++	 return -1;
+   }
+ 
+   cache->writes++;
+@@ -114,39 +114,39 @@
+   long i;
+ 
+   if (cache->head != NULL)
+-    return;
++	 return;
+ 
+   for (i = 0; i < cache->items; i++)
+   {
+-    newItem = (CACHEITEM UUFAR *) MALLOC(sizeof(CACHEITEM));
+-    checkref(newItem);
++	 newItem = (CACHEITEM UUFAR *) MALLOC(sizeof(CACHEITEM));
++	 checkref(newItem);
+ 
+-    newItem->buffer = MALLOC(cache->itemsize);
+-    checkref(newItem->buffer);
++	 newItem->buffer = MALLOC(cache->itemsize);
++	 checkref(newItem->buffer);
+ 
+-    newItem->index = -1;
+-    newItem->dirty = 0;
++	 newItem->index = -1;
++	 newItem->dirty = 0;
+ 
+-    if (cache->head == NULL)
+-    {
+-      cache->head = cache->tail = newItem;
+-      newItem->prev = newItem->next = NULL;
+-    }
+-    else
+-    {
+-      newItem->prev = NULL;
+-      newItem->next = cache->head;
+-      cache->head->prev = newItem;
+-      cache->head = newItem;
+-    }
++	 if (cache->head == NULL)
++	 {
++		cache->head = cache->tail = newItem;
++		newItem->prev = newItem->next = NULL;
++	 }
++	 else
++	 {
++		newItem->prev = NULL;
++		newItem->next = cache->head;
++		cache->head->prev = newItem;
++		cache->head = newItem;
++	 }
+ 
+   } /* for (i = 0; i < cache->items; i++) */
+ 
+   printmsg(4, "cache_alloc: %ld cache items with %d byte buffers "
+-              "for file %d allocated",
+-               (long) cache->items,
+-               (int) cache->itemsize,
+-               cache->file);
++				  "for file %d allocated",
++					(long) cache->items,
++					(int) cache->itemsize,
++					cache->file);
+ 
+ } /* cache_alloc */
+ 
+@@ -155,24 +155,24 @@
+   CACHEITEM UUFAR *item;
+ 
+   if (cache->items > 0 && cache->head == NULL)
+-    cache_alloc(cache); /* delayed until here in case it is never actually used */
++	 cache_alloc(cache); /* delayed until here in case it is never actually used */
+ 
+   if ((item = cache->tail) == NULL)
+-    return dirty ? cache_write(cache, index, buffer) : 0;
++	 return dirty ? cache_write(cache, index, buffer) : 0;
+ 
+   if (item->dirty)
+   {
+-    int rc;
++	 int rc;
+ 
+-    char *tempBuffer = (char *) malloc( cache->itemsize );
++	 char *tempBuffer = (char *) malloc( cache->itemsize );
+ 
+-    checkref( tempBuffer );
+-    MEMCPY( tempBuffer, item->buffer, cache->itemsize );
+-    rc = cache_write(cache, item->index, tempBuffer);
+-    free( tempBuffer );
++	 checkref( tempBuffer );
++	 MEMCPY( tempBuffer, item->buffer, cache->itemsize );
++	 rc = cache_write(cache, item->index, tempBuffer);
++	 free( tempBuffer );
+ 
+-    if (rc != 0)
+-       return -1;
++	 if (rc != 0)
++		 return -1;
+ 
+   } /* if (item->dirty) */
+ 
+@@ -198,26 +198,26 @@
+ 
+   for (item = cache->head; item != NULL; item = item->next)
+   {
+-    if (index == item->index)
+-    {
+-      if (item->prev != NULL) /* maintain LRU order */
+-      {
+-        item->prev->next = item->next;
+-
+-        if (item->next != NULL)
+-          item->next->prev = item->prev;
+-        else
+-          cache->tail = item->prev;
+-
+-        item->prev = NULL;
+-        item->next = cache->head;
+-        cache->head->prev = item;
+-        cache->head = item;
+-      }
++	 if (index == item->index)
++	 {
++		if (item->prev != NULL) /* maintain LRU order */
++		{
++		  item->prev->next = item->next;
++
++		  if (item->next != NULL)
++			 item->next->prev = item->prev;
++		  else
++			 cache->tail = item->prev;
++
++		  item->prev = NULL;
++		  item->next = cache->head;
++		  cache->head->prev = item;
++		  cache->head = item;
++		}
+ 
+-      return item;                  /* Return success to caller      */
++		return item;						/* Return success to caller		*/
+ 
+-    }
++	 }
+ 
+   } /* for */
+ 
+@@ -238,21 +238,21 @@
+   checkref(cache);
+ 
+   cache->magic    = CACHE_MAGIC;
+-  cache->file     = file;
++  cache->file		= file;
+   cache->itemsize = itemsize;
+ 
+-  if ( items < 4 )            /* Avoid funky boundry conditions   */
+-     cache->items    = 4;
+-   else
+-     cache->items    = items;
++  if ( items < 4 )				/* Avoid funky boundry conditions	*/
++	  cache->items    = 4;
++	else
++	  cache->items    = items;
+ 
+   cache->reads = cache->writes = cache->total = 0;
+   cache->head = cache->tail = NULL;
+ 
+ #ifdef UDEBUG
+   printmsg(4, "cache_init: %ld item cache for file %d initialized",
+-                           items,
+-                           file);
++									items,
++									file);
+ #endif
+ 
+   return cache;
+@@ -265,29 +265,29 @@
+   char *tempBuffer;
+ 
+   if (cache == NULL || cache->magic != CACHE_MAGIC)
+-    return;
++	 return;
+ 
+   tempBuffer = (char *) malloc( cache->itemsize );
+   checkref( tempBuffer );
+ 
+   for (item = cache->head; item != NULL; item = item->next)
+-    if (item->dirty)
+-    {
+-      MEMCPY( tempBuffer, item->buffer, cache->itemsize );
+-      if ( cache_write(cache, item->index, tempBuffer) == -1 )
+-      {
+-         printmsg(0,"cache_flush: Unable to flush record %ld", item->index );
+-      }
+-      else {
++	 if (item->dirty)
++	 {
++		MEMCPY( tempBuffer, item->buffer, cache->itemsize );
++		if ( cache_write(cache, item->index, tempBuffer) == -1 )
++		{
++			printmsg(0,"cache_flush: Unable to flush record %ld", item->index );
++		}
++		else {
+ 
+ #ifdef UDEBUG
+-      printmsg(8, "cache_flush: record %d written to disk", item->index);
++		printmsg(8, "cache_flush: record %d written to disk", item->index);
+ #endif
+-         item->dirty = 0;
+-      }
+-    }
++			item->dirty = 0;
++		}
++	 }
+ 
+-    free( tempBuffer );
++	 free( tempBuffer );
+ 
+ } /* cache_flush */
+ 
+@@ -298,22 +298,22 @@
+   long percent;
+ 
+   if (cache == NULL || cache->magic != CACHE_MAGIC)
+-    return;
++	 return;
+ 
+   cache_flush(cache);
+ 
+   if (cache->total)
+   {
+-    percent = 100 - (cache->reads + cache->writes) * 100 / cache->total;
+-    printmsg(2,"cache_exit: %ld read and %ld write I/O calls, hit rate %ld%%",
+-             cache->reads, cache->writes, percent);
++	 percent = 100 - (cache->reads + cache->writes) * 100 / cache->total;
++	 printmsg(3,"cache_exit: %ld read and %ld write I/O calls, hit rate %ld%%",
++				 cache->reads, cache->writes, percent);
+   }
+ 
+   for (item = cache->head; item != NULL; item = next)
+   {
+-    next = item->next;
+-    FREE(item->buffer);
+-    FREE(item);
++	 next = item->next;
++	 FREE(item->buffer);
++	 FREE(item);
+   }
+ 
+   FREE(cache);
+@@ -326,7 +326,7 @@
+   int rc;
+ 
+   if (cache == NULL || cache->magic != CACHE_MAGIC)
+-    return -1;
++	 return -1;
+ 
+   cache->total++;
+ 
+@@ -334,11 +334,11 @@
+   {
+ 
+ #ifdef UDEBUG
+-    printmsg(10, "cache_get: record %d found in cache", index);
++	 printmsg(10, "cache_get: record %d found in cache", index);
+ #endif
+ 
+-    MEMCPY(buffer, item->buffer, cache->itemsize);
+-    return 0;
++	 MEMCPY(buffer, item->buffer, cache->itemsize);
++	 return 0;
+   }
+ 
+ #ifdef UDEBUG
+@@ -346,7 +346,7 @@
+ #endif
+ 
+   if ((rc = cache_read(cache, index, buffer)) == 0)
+-    rc = cache_add(cache, index, buffer, 0);
++	 rc = cache_add(cache, index, buffer, 0);
+ 
+   return rc;
+ }
+@@ -356,19 +356,19 @@
+   CACHEITEM UUFAR *item;
+ 
+   if (cache == NULL || cache->magic != CACHE_MAGIC)
+-    return -1;
++	 return -1;
+ 
+   cache->total++;
+ 
+   if ((item = cache_find(cache, index)) != NULL)
+   {
+ #ifdef UDEBUG
+-    printmsg(10, "cache_put: record %ld found in cache", index);
++	 printmsg(10, "cache_put: record %ld found in cache", index);
+ #endif
+ 
+-    MEMCPY(item->buffer, buffer, cache->itemsize);
+-    item->dirty = 1;
+-    return 0;
++	 MEMCPY(item->buffer, buffer, cache->itemsize);
++	 item->dirty = 1;
++	 return 0;
+   }
+ 
+ #ifdef UDEBUG
+--- e:\uupc1.12s\source\news\expire.c	Wed Apr 23 19:56:54 1997
++++ expire.c	Thu Aug 21 20:05:22 1997
+@@ -1,59 +1,68 @@
+ /*--------------------------------------------------------------------*/
+-/*    e x p i r e . c                                                 */
++/*    e x p i r e . c																 */
+ /*                                                                    */
+-/*    Expire old news articles for UUPC/extended                      */
++/*    Expire old news articles for UUPC/extended							 */
+ /*                                                                    */
+-/*    Copyright (c) 1992-1994 by Kendra Electronic Wonderworks, all   */
+-/*    rights reserved except those explicitly granted by the UUPC/    */
++/*    Copyright (c) 1992-1994 by Kendra Electronic Wonderworks, all	 */
++/*    rights reserved except those explicitly granted by the UUPC/	 */
+ /*    extended license.                                               */
+ /*--------------------------------------------------------------------*/
+ 
+-/* new version, rewritten for history-based news database
++/*
++ * 21 Aug 97 (JDC):
++ *             Looks like the patched expire.exe is working now.
++ *             By trying to fix the one bug, I accidently created
++ *             another.  I redefined the stat buffer as a nonpointer,
++ *             which keeps it from crashing.  Now, I just need to
++ *             test it out for a few days to make sure it actually
++ *             solves the problem.
+  *
+- * Author:  Kai Uwe Rommel <rommel@ars.muc.de>
++ * new version, rewritten for history-based news database
++ *
++ * Author:	Kai Uwe Rommel <rommel@ars.muc.de>
+  * Created: Sun Aug 15 1993
+  *
+  *    $Id: expire.c 1.22 1997/04/24 00:56:54 ahd Exp $
+  *
+  *    $Log: expire.c $
+- *    Revision 1.22  1997/04/24 00:56:54  ahd
++ *    Revision 1.22	1997/04/24 00:56:54	ahd
+  *    Delete MAKEBUF/FREEBUF support
+  *
+- *    Revision 1.21  1996/11/18 04:46:49  ahd
++ *    Revision 1.21	1996/11/18 04:46:49	ahd
+  *    Normalize arguments to bugout
+  *    Reset title after exec of sub-modules
+  *    Normalize host status names to use HS_ prefix
+  *
+- *    Revision 1.20  1995/12/12 13:48:54  ahd
++ *    Revision 1.20	1995/12/12 13:48:54	ahd
+  *    Use binary tree for news group active file
+  *    Use large buffers in news programs to avoid overflow of hist db recs
+  *    Use true recursive function to walk entire active file
+  *
+- *    Revision 1.19  1995/12/03 13:51:44  ahd
++ *    Revision 1.19	1995/12/03 13:51:44	ahd
+  *    Additional debugging cleanup
+  *
+- *    Revision 1.17  1995/09/11 00:20:45  ahd
++ *    Revision 1.17	1995/09/11 00:20:45	ahd
+  *    Correct compile warning
+  *
+- *    Revision 1.16  1995/08/27 23:33:15  ahd
++ *    Revision 1.16	1995/08/27 23:33:15	ahd
+  *    Load and use ACTIVE file as tree structure
+  *
+- *    Revision 1.15  1995/03/11 22:29:13  ahd
++ *    Revision 1.15	1995/03/11 22:29:13	ahd
+  *    Use macro for file delete to allow special OS/2 processing
+  *
+- *    Revision 1.14  1995/02/20 00:03:07  ahd
++ *    Revision 1.14	1995/02/20 00:03:07	ahd
+  *    Drop previous work history file before creating new one
+  *
+- *    Revision 1.13  1995/02/12 23:37:04  ahd
++ *    Revision 1.13	1995/02/12 23:37:04	ahd
+  *    compiler cleanup, NNS C/news support, optimize dir processing
+  *
+- *    Revision 1.12  1995/01/30 04:08:36  ahd
++ *    Revision 1.12	1995/01/30 04:08:36	ahd
+  *    Additional compiler warning fixes
+  *
+- *    Revision 1.11  1995/01/29 14:03:29  ahd
++ *    Revision 1.11	1995/01/29 14:03:29	ahd
+  *    Clean up IBM C/Set compiler warnings
+  *
+- *    Revision 1.10  1995/01/15 19:48:35  ahd
++ *    Revision 1.10	1995/01/15 19:48:35	ahd
+  *    Allow active file to be optional
+  *    Delete fullbatch global option
+  *    Add "local" and "batch" flags to SYS structure for news
+@@ -68,16 +77,16 @@
+  *    Clean yp RCS information
+  *    patches from Kai Uwe Rommel
+  *
+- * Revision 1.6  1994/02/19  04:21:11  ahd
++ * Revision 1.6  1994/02/19  04:21:11	ahd
+  * Use standard first header
+  *
+- * Revision 1.5  1994/01/01  19:14:06  ahd
++ * Revision 1.5  1994/01/01  19:14:06	ahd
+  * Annual Copyright Update
+  *
+- * Revision 1.4  1993/12/23  03:16:03  rommel
++ * Revision 1.4  1993/12/23  03:16:03	rommel
+  * OS/2 32 bit support for additional compilers
+  *
+- * Revision 1.3  1993/12/09  04:51:21  ahd
++ * Revision 1.3  1993/12/09  04:51:21	ahd
+  * restore ability to expire without having history database
+  *
+  */
+@@ -87,14 +96,14 @@
+ RCSID("$Id: expire.c 1.22 1997/04/24 00:56:54 ahd Exp $");
+ 
+ /*--------------------------------------------------------------------*/
+-/*                        System include files                        */
++/*                        System include files								 */
+ /*--------------------------------------------------------------------*/
+ 
+ #include <ctype.h>
+ #include <limits.h>
+ 
+ /*--------------------------------------------------------------------*/
+-/*                    UUPC/extended include files                     */
++/*                    UUPC/extended include files							 */
+ /*--------------------------------------------------------------------*/
+ 
+ #include "active.h"
+@@ -119,7 +128,7 @@
+ currentfile();
+ 
+ /*--------------------------------------------------------------------*/
+-/*                        Internal prototypes                         */
++/*                        Internal prototypes								 */
+ /*--------------------------------------------------------------------*/
+ 
+ static void HistoryExpireAll( char **groups, const time_t expire_date );
+@@ -127,219 +136,228 @@
+ static void usage( void );
+ 
+ static long total_articles_purged = 0;
+-static long total_articles_kept   = 0;
+-static long total_cross_purged    = 0;
+-static long total_cross_kept      = 0;
+-static long total_bytes_purged    = 0;
+-static long total_bytes_kept      = 0;
++static long total_articles_kept	 = 0;
++static long total_cross_purged	 = 0;
++static long total_cross_kept		 = 0;
++static long total_bytes_purged	 = 0;
++static long total_bytes_kept		 = 0;
+ 
+ static DBM *history;
+ static DBM *new_history;
+ 
+ /*--------------------------------------------------------------------*/
+-/*       b a c k u p N e w s F i l e                                  */
++/*       b a c k u p N e w s F i l e											 */
+ /*                                                                    */
+-/*       Delete an old news database file, and optionally rename a    */
+-/*       newer file to the name of the just deleted file.             */
++/*       Delete an old news database file, and optionally rename a	 */
++/*       newer file to the name of the just deleted file.				 */
+ /*--------------------------------------------------------------------*/
+ 
+ static void
+ backupNewsFile(  const char *nextGeneration, const char *previous )
+ {
+-   char file_previous[FILENAME_MAX];
+-   char file_new[FILENAME_MAX];
++	char file_previous[FILENAME_MAX];
++	char file_new[FILENAME_MAX];
+ 
+-   mkfilename(file_previous, E_newsdir, previous);
++	mkfilename(file_previous, E_newsdir, previous);
+ 
+ /*--------------------------------------------------------------------*/
+ /*       Punt the old file, and return if there is no new file        */
+ /*--------------------------------------------------------------------*/
+ 
+-   REMOVE(file_previous);
++	REMOVE(file_previous);
+ 
+-   if ( nextGeneration == NULL )
+-      return;
++	if ( nextGeneration == NULL )
++		return;
+ 
+ /*--------------------------------------------------------------------*/
+-/*         Build the new file name and move into the old name         */
++/*         Build the new file name and move into the old name			 */
+ /*--------------------------------------------------------------------*/
+ 
+-   mkfilename(file_new, E_newsdir, nextGeneration);
++	mkfilename(file_new, E_newsdir, nextGeneration);
+ 
+-   if ( rename(file_new, file_previous) )
+-   {
+-      printerr( file_new );
+-   }
++	if ( rename(file_new, file_previous) )
++	{
++		printerr( file_new );
++	}
+ #ifdef UDEBUG
+-   else
+-      printmsg(2, "Renamed %s to %s", file_new, file_previous );
++	else
++		printmsg(2, "Renamed %s to %s", file_new, file_previous );
+ #endif
+ 
+ 
+ } /* backupNewsFile */
+ 
+ /*--------------------------------------------------------------------*/
+-/*       r e s e t O n e A r t i c l e G r o u p                      */
++/*       r e s e t O n e A r t i c l e G r o u p							 */
+ /*                                                                    */
+-/*       Set oldest and newest article numbers to same                */
++/*       Set oldest and newest article numbers to same					 */
+ /*--------------------------------------------------------------------*/
+ 
+ void
+ resetOneArticleGroup( const char *group, void *dummy )
+ {
+-   setArticleOldest( group, getArticleNewest( group ));
++	setArticleOldest( group, getArticleNewest( group ));
+ } /* resetOneArticleGroup */
+ 
+ /*--------------------------------------------------------------------*/
+-/*    m a i n                                                         */
++/*    m a i n																			 */
+ /*                                                                    */
+-/*    Main program                                                    */
++/*    Main program																	 */
+ /*--------------------------------------------------------------------*/
+ 
+ main( int argc, char **argv)
+ {
+-   int c;
+-   extern char *optarg;
+-   extern int   optind;
+-   char **groups = NULL;
++	int c;
++	extern char *optarg;
++	extern int	 optind;
++	char **groups = NULL;
+ 
+-   time_t expire_period  = 7; /* Seven days visible to users         */
+-   time_t expire_date;
++	time_t expire_period  = 7; /* Seven days visible to users			*/
++	time_t expire_date;
+ 
+ /*--------------------------------------------------------------------*/
+-/*     Report our version number and date/time compiled               */
++/*     Report our version number and date/time compiled					 */
+ /*--------------------------------------------------------------------*/
+ 
+-   debuglevel = 1;
+-   banner( argv );
++	debuglevel = 1;
++	banner( argv );
+ 
+ #if defined(__CORE__)
+-   copywrong = strdup(copyright);
+-   checkref(copywrong);
++	copywrong = strdup(copyright);
++	checkref(copywrong);
+ #endif
+ 
+ /*--------------------------------------------------------------------*/
+-/*        Process our arguments                                       */
++/*        Process our arguments													 */
+ /*--------------------------------------------------------------------*/
+ 
+-   while ((c = getopt(argc, argv, "e:x:")) !=  EOF)
+-      switch(c) {
++	while ((c = getopt(argc, argv, "e:x:")) !=  EOF)
++		switch(c) {
+ 
+-      case 'e':
+-         expire_period = atoi( optarg );
+-         break;
+-
+-      case 'x':
+-         debuglevel = atoi( optarg );
+-         break;
+-
+-      case '?':
+-         usage();
+-         exit(1);
+-         break;
+-
+-      default:
+-         printmsg(0, "expire - invalid option -%c", c);
+-         usage();
+-         exit(2);
+-         break;
+-   }
++		case 'e':
++			expire_period = atoi( optarg );
++			break;
++
++		case 'x':
++			debuglevel = atoi( optarg );
++			break;
++
++		case '?':
++			usage();
++			exit(1);
++			break;
++
++		default:
++			printmsg(0, "expire - invalid option -%c", c);
++			usage();
++			exit(2);
++			break;
++	}
+ 
+-   if (optind != argc)
+-      groups = argv + optind;
++	if (optind != argc)
++		groups = argv + optind;
+ 
+ /*--------------------------------------------------------------------*/
+ /*                             Initialize                             */
+ /*--------------------------------------------------------------------*/
+ 
+-   if (!configure( B_EXPIRE ))
+-      exit(1);   /* system configuration failed */
++	if (!configure( B_EXPIRE ))
++		exit(1);   /* system configuration failed */
+ 
+ /*--------------------------------------------------------------------*/
+ /*                    Switch to the news directory                    */
+ /*--------------------------------------------------------------------*/
+ 
+-   PushDir( E_newsdir );
+-   atexit( PopDir );
++	PushDir( E_newsdir );
++	atexit( PopDir );
+ 
+ /*--------------------------------------------------------------------*/
+-/*                     Initialize logging file                        */
++/*                     Initialize logging file								 */
+ /*--------------------------------------------------------------------*/
+ 
+-   openlog( NULL );
++	openlog( NULL );
+ 
+ /*--------------------------------------------------------------------*/
+-/*                 Load the history and active files                  */
++/*                 Load the history and active files						 */
+ /*--------------------------------------------------------------------*/
+ 
+-  backupNewsFile( NULL, "newhist.dir" );  /* Delete any junk history */
+-  backupNewsFile( NULL, "newhist.pag" );  /* Delete any junk history */
++	backupNewsFile( NULL, "newhist.dir" );  /* Delete any junk history */
++	backupNewsFile( NULL, "newhist.pag" );  /* Delete any junk history */
+ 
+-   history = open_history("history");
+-   new_history = open_history("newhist");
++	history = open_history("history");
++	new_history = open_history("newhist");
+ 
+-   loadActive( KWTrue );      /* Get sequence numbers for groups from
+-                                 active file                      */
++	loadActive( KWTrue );		/* Get sequence numbers for groups from
++											active file                      */
+ 
+ /*--------------------------------------------------------------------*/
+-/*                       Reset article numbers                        */
++/*                       Reset article numbers								 */
+ /*--------------------------------------------------------------------*/
+ 
+-   startActiveWalk( resetOneArticleGroup, 0);
++	startActiveWalk( resetOneArticleGroup, 0);
+ 
+ /*--------------------------------------------------------------------*/
+-/*                  Compute times for expiring files                  */
++/*                  Compute times for expiring files						 */
+ /*--------------------------------------------------------------------*/
+ 
+-   time( &expire_date );
+-   expire_date  -= (expire_period * ONE_DAY);
++	time( &expire_date );
++	expire_date  -= (expire_period * ONE_DAY);
+ 
+-   printmsg(1,"expire: Purging news older than %s (%ld days)",
+-            dater( expire_date , NULL), (long) expire_period );
++	printmsg(1,"expire: Purging news older than %s (%ld days)",
++				dater( expire_date , NULL), (long) expire_period );
+ 
+ /*--------------------------------------------------------------------*/
+-/*    Process groups as requested, otherwise process the entire       */
+-/*    history database                                                */
++/*    Process groups as requested, otherwise process the entire		 */
++/*    history database																 */
+ /*--------------------------------------------------------------------*/
+ 
+-   HistoryExpireAll(groups, expire_date );
++	HistoryExpireAll(groups, expire_date );
++
++	printmsg(15, "Finished HistoryExpireAll()");
+ 
+ /*--------------------------------------------------------------------*/
+ /*       Backup our existing history files, and then move the new     */
+ /*       history databases into place.                                */
+ /*--------------------------------------------------------------------*/
+ 
+-   close_history(history);
+-   close_history(new_history);
++	close_history(history);
++	close_history(new_history);
++
++	printmsg(15, "History files are closed.");
+ 
+-   backupNewsFile( "history.dir", "oldhist.dir" );
+-   backupNewsFile( "history.pag", "oldhist.pag" );
++	backupNewsFile( "history.dir", "oldhist.dir" );
++	backupNewsFile( "history.pag", "oldhist.pag" );
+ 
+-   backupNewsFile( "newhist.dir", "history.dir" );
+-   backupNewsFile( "newhist.pag", "history.pag" );
++	backupNewsFile( "newhist.dir", "history.dir" );
++	backupNewsFile( "newhist.pag", "history.pag" );
++
++	printmsg(15, "History files are renamed.");
+ 
+ /*--------------------------------------------------------------------*/
+ /*                         Clean up and exit                          */
+ /*--------------------------------------------------------------------*/
+ 
+-   writeActive();
++	writeActive();
++
++// I don't think it gets this far before it crashes
++	printmsg(15, "Active file is written.");
+ 
+-   if ( total_articles_purged)
+-      printmsg(1,"Purged %ld articles, %ld cross postings (%ld bytes).",
+-               total_articles_purged, total_cross_purged, total_bytes_purged );
++	if ( total_articles_purged)
++		printmsg(1,"Purged %ld articles, %ld cross postings (%ld bytes).",
++					total_articles_purged, total_cross_purged, total_bytes_purged );
+ 
+-   printmsg(1,"Total of %ld articles, %ld cross postings (%ld bytes)." ,
+-            total_articles_kept, total_cross_kept, total_bytes_kept );
++	printmsg(1,"Total of %ld articles, %ld cross postings (%ld bytes)." ,
++				total_articles_kept, total_cross_kept, total_bytes_kept );
+ 
+-   exit(0);
+-   return 0;                        /* For brain dead IBM C/Set      */
++	exit(0);
++//   return 0;                        /* For brain dead IBM C/Set      */
+ 
+ } /* main */
+ 
+ /*--------------------------------------------------------------------*/
+-/*    S e t G r o u p L o w e r                                       */
++/*    S e t G r o u p L o w e r													 */
+ /*                                                                    */
+-/*    Set the lower bounds of all groups an article is posted to      */
++/*    Set the lower bounds of all groups an article is posted to		 */
+ /*--------------------------------------------------------------------*/
+ 
+ static void
+@@ -351,22 +369,22 @@
+ 
+   checkref( value );
+   strcpy(value, histentry);
+-  strtok(value, " ");   /* strip off date */
++  strtok(value, " ");	/* strip off date */
+   strtok(NULL, " ");    /* strip off size */
+ 
+   while ((group = strtok(NULL, "," WHITESPACE )) != NULL)
+   {
+ 
+-    long lowest;
++	 long lowest;
+ 
+-    num = strchr(group, ':');
+-    *num++ = 0;
+-    article = atol(num);
++	 num = strchr(group, ':');
++	 *num++ = 0;
++	 article = atol(num);
+ 
+-    lowest = getArticleOldest( group );
++	 lowest = getArticleOldest( group );
+ 
+-    if (article && ( lowest > article ))
+-      setArticleOldest( group, article );
++	 if (article && ( lowest > article ))
++		setArticleOldest( group, article );
+ 
+   } /* while ((group = strtok(NULL, "," WHITESPACE )) != NULL) */
+ 
+@@ -375,83 +393,99 @@
+ } /* SetGroupLower */
+ 
+ /*--------------------------------------------------------------------*/
+-/*    H i s t o r y E x p i r e A l l                                 */
++/*    H i s t o r y E x p i r e A l l											 */
+ /*                                                                    */
+ /*    Expire all requested news groups                                */
+ /*--------------------------------------------------------------------*/
+ 
+ static void HistoryExpireAll( char **groups, const time_t expire_date )
+ {
+-   char *messageID, *histentry;
+-   time_t article_date;
+-   long article_size;
+-   int total, remaining, deleted;
+-   int found;
+-
+-   for (found = get_first_histentry(history, &messageID, &histentry); found;
+-        found = get_next_histentry(history, &messageID, &histentry))
+-   {
++	char *messageID, *histentry;
++	time_t article_date;
++	long article_size;
++	int total, remaining, deleted;
++	int found;
++
++	for (found = get_first_histentry(history, &messageID, &histentry); found;
++		  found = get_next_histentry(history, &messageID, &histentry))
++	{
+ 
+-     sscanf(histentry, "%ld %ld",
+-            &article_date, &article_size);
++		sscanf(histentry, "%ld %ld",
++				&article_date, &article_size);
+ 
+-     remaining = total = count_postings(histentry);
++		remaining = total = count_postings(histentry);
+ 
+ #ifdef UDEBUG
+-      if ( debuglevel > 8 )
+-         printmsg(8,"Article %s expires %.24s, %d bytes, %d copies",
+-                     messageID,
+-                     ctime( &article_date ),
+-                     article_size,
+-                     total );
++		if ( debuglevel > 8 )
++			printmsg(8,"Article %s expires %.24s, %d bytes, %d copies",
++							messageID,
++							ctime( &article_date ),
++							article_size,
++							total );
++#endif
++
++		if (article_date < expire_date)
++		{
++#ifdef DEBUG
++			printmsg(10, "article date, %lu, is less than expire_date, %lu");
++#endif
++			if ((histentry = purge_article(histentry, groups)) == NULL)
++			{
++#ifdef DEBUG
++				printmsg(10, "purge_article returned NULL, so setting remaining to 0");
++#endif
++				remaining = 0;
++			}
++			else
++			{
++#ifdef DEBUG
++				printmsg(10, "purge_article did not return NULL, so calling count_postings");
++#endif
++				remaining = count_postings(histentry);
++#ifdef DEBUG
++				printmsg(10, "remaining: %lu", remaining);
+ #endif
++			}
++		}
+ 
+-     if (article_date < expire_date)
+-     {
+-       if ((histentry = purge_article(histentry, groups)) == NULL)
+-         remaining = 0;
+-       else
+-         remaining = count_postings(histentry);
+-     }
+-
+-     if ( remaining )
+-     {
+-       add_histentry(new_history, messageID, histentry);
+-       SetGroupLower(histentry);
+-     }
+-
+-     deleted = (total - remaining);
+-
+-     if (deleted > 1)
+-     {
+-       total_articles_purged += 1;
+-       total_cross_purged    += (deleted - 1);
+-     }
+-     else
+-       total_articles_purged += deleted;
+-
+-     if (remaining > 1)
+-     {
+-       total_articles_kept   += 1;
+-       total_cross_kept      += (remaining - 1);
+-     }
+-     else
+-       total_articles_kept   += remaining;
+-
+-     total_bytes_purged    += deleted * article_size;
+-     total_bytes_kept      += remaining * article_size;
+-   }
++		if ( remaining )
++		{
++			add_histentry(new_history, messageID, histentry);
++			SetGroupLower(histentry);
++		}
++
++		deleted = (total - remaining);
++
++		if (deleted > 1)
++		{
++			total_articles_purged += 1;
++			total_cross_purged	 += (deleted - 1);
++		}
++		else
++			total_articles_purged += deleted;
++
++		if (remaining > 1)
++		{
++			total_articles_kept	 += 1;
++			total_cross_kept		 += (remaining - 1);
++		}
++		else
++			total_articles_kept	 += remaining;
++
++		total_bytes_purged	 += deleted * article_size;
++		total_bytes_kept		 += remaining * article_size;
++	}
+ 
+ } /* HistoryExpireAll */
+ 
+ /*--------------------------------------------------------------------*/
+-/*    u s a g e                                                       */
++/*    u s a g e																		 */
+ /*                                                                    */
+-/*    Print usage of program                                          */
++/*    Print usage of program														 */
+ /*--------------------------------------------------------------------*/
+ 
+ static void usage( void )
+ {
+-   printf( "Usage:   expire [-edays] [group ...]\n");
+-   exit(1);
++	printf( "Usage:   expire [-edays] [group ...]\n");
++	exit(1);
+ } /* usage */
+--- e:\uupc1.12s\source\news\genhist.c	Wed Apr 23 20:39:02 1997
++++ genhist.c	Sun Aug 10 11:11:20 1997
+@@ -3,66 +3,66 @@
+  * (Re-)Create history database from scratch.
+  * Based on parts of the old expire program.
+  *
+- * Author:  Kai Uwe Rommel <rommel@ars.muc.de>
++ * Author:	Kai Uwe Rommel <rommel@ars.muc.de>
+  * Created: Sun Aug 15 1993
+  */
+ 
+ /*--------------------------------------------------------------------*/
+-/*       Changes Copyright (c) 1989-1997 by Kendra Electronic         */
+-/*       Wonderworks.                                                 */
++/*       Changes Copyright (c) 1989-1997 by Kendra Electronic			 */
++/*       Wonderworks.																 */
+ /*                                                                    */
+-/*       All rights reserved except those explicitly granted by       */
+-/*       the UUPC/extended license agreement.                         */
++/*       All rights reserved except those explicitly granted by		 */
++/*       the UUPC/extended license agreement.								 */
+ /*--------------------------------------------------------------------*/
+ 
+ /*--------------------------------------------------------------------*/
+-/*                          RCS Information                           */
++/*                          RCS Information									 */
+ /*--------------------------------------------------------------------*/
+ 
+ /* $Log: genhist.c $
+-/* Revision 1.22  1997/04/24 01:39:02  ahd
++/* Revision 1.22	1997/04/24 01:39:02	ahd
+ /* Annual Copyright Update
+ /*
+-/* Revision 1.21  1996/11/22 03:12:25  ahd
++/* Revision 1.21	1996/11/22 03:12:25	ahd
+ /* Correct compile warning
+ /*
+-/* Revision 1.20  1996/11/18 04:46:49  ahd
++/* Revision 1.20	1996/11/18 04:46:49	ahd
+ /* Normalize arguments to bugout
+ /* Reset title after exec of sub-modules
+ /* Normalize host status names to use HS_ prefix
+ /*
+- * Revision 1.19  1996/01/01 21:08:50  ahd
++ * Revision 1.19	1996/01/01 21:08:50	ahd
+  * Annual Copyright Update
+  *
+- * Revision 1.18  1995/12/12 13:48:54  ahd
++ * Revision 1.18	1995/12/12 13:48:54	ahd
+  * Use binary tree for news group active file
+  * Use large buffers in news programs to avoid overflow of hist db recs
+  * Use true recursive function to walk entire active file
+  *
+- * Revision 1.17  1995/12/03 13:51:44  ahd
++ * Revision 1.17	1995/12/03 13:51:44	ahd
+  * Additional debugging cleanup
+  *
+- * Revision 1.16  1995/08/27 23:33:15  ahd
++ * Revision 1.16	1995/08/27 23:33:15	ahd
+  * Load and use ACTIVE file as tree structure
+  *
+- * Revision 1.15  1995/03/11 22:29:24  ahd
++ * Revision 1.15	1995/03/11 22:29:24	ahd
+  * Use macro for file delete to allow special OS/2 processing
+  *
+- * Revision 1.14  1995/01/30 04:08:36  ahd
++ * Revision 1.14	1995/01/30 04:08:36	ahd
+  * Additional compiler warning fixes
+  *
+- * Revision 1.13  1995/01/29 14:03:29  ahd
++ * Revision 1.13	1995/01/29 14:03:29	ahd
+  * Clean up IBM C/Set compiler warnings
+  *
+-/* Revision 1.12  1995/01/15 19:48:35  ahd
++/* Revision 1.12	1995/01/15 19:48:35	ahd
+ /* Allow active file to be optional
+ /* Delete fullbatch global option
+ /* Add "local" and "batch" flags to SYS structure for news
+ /*
+-/* Revision 1.11  1995/01/07 16:21:14  ahd
++/* Revision 1.11	1995/01/07 16:21:14	ahd
+ /* Change KWBoolean to KWBoolean to avoid VC++ 2.0 conflict
+ /*
+-/* Revision 1.10  1995/01/02 05:03:27  ahd
++/* Revision 1.10	1995/01/02 05:03:27	ahd
+ /* Pass 2 of integrating SYS file support from Mike McLagan
+ /*
+ /* Revision 1.9  1994/12/22 00:24:30  ahd
+@@ -72,25 +72,25 @@
+ /* Clean yp RCS information
+ /* patches from Kai Uwe Rommel
+ /*
+- * Revision 1.7  1994/03/20  23:35:57  rommel
++ * Revision 1.7  1994/03/20  23:35:57	rommel
+  * Also update active file with discovered information
+  *
+- * Revision 1.6  1994/02/19  04:21:26  ahd
++ * Revision 1.6  1994/02/19  04:21:26	ahd
+  * Use standard first header
+  *
+- * Revision 1.5  1994/01/01  19:14:13  ahd
++ * Revision 1.5  1994/01/01  19:14:13	ahd
+  * Annual Copyright Update
+  *
+- * Revision 1.4  1993/12/09  13:24:25  ahd
++ * Revision 1.4  1993/12/09  13:24:25	ahd
+  * Enforce options=history being set to use program
+  *
+- * Revision 1.3  1993/11/06  13:04:13  ahd
++ * Revision 1.3  1993/11/06  13:04:13	ahd
+  * Update usage message
+  *
+- * Revision 1.2  1993/10/30  22:27:57  rommel
++ * Revision 1.2  1993/10/30  22:27:57	rommel
+  * Lower debug level to 1
+  *
+- * Revision 1.1  1993/09/05  10:56:49  rommel
++ * Revision 1.1  1993/09/05  10:56:49	rommel
+  * Initial revision
+  * */
+ 
+@@ -100,14 +100,14 @@
+ RCSID("$Id: genhist.c 1.22 1997/04/24 01:39:02 ahd Exp $");
+ 
+ /*--------------------------------------------------------------------*/
+-/*                        System include files                        */
++/*                        System include files								 */
+ /*--------------------------------------------------------------------*/
+ 
+ #include <ctype.h>
+ #include <limits.h>
+ 
+ /*--------------------------------------------------------------------*/
+-/*                    UUPC/extended include files                     */
++/*                    UUPC/extended include files							 */
+ /*--------------------------------------------------------------------*/
+ 
+ #include "active.h"
+@@ -126,7 +126,7 @@
+ currentfile();
+ 
+ /*--------------------------------------------------------------------*/
+-/*                        Internal prototypes                         */
++/*                        Internal prototypes								 */
+ /*--------------------------------------------------------------------*/
+ 
+ static void IndexAll( void );
+@@ -146,363 +146,365 @@
+ backupHistory( void )
+ {
+ 
+-   char file_old[FILENAME_MAX];
+-   char file_new[FILENAME_MAX];
+-   mkfilename(file_old, E_newsdir, "oldhist.dir");
+-   mkfilename(file_new, E_newsdir, "history.dir");
+-   REMOVE(file_old);
+-   rename(file_new, file_old);
+-
+-   mkfilename(file_old, E_newsdir, "oldhist.pag");
+-   mkfilename(file_new, E_newsdir, "history.pag");
+-   REMOVE(file_old);
+-   rename(file_new, file_old);
++	char file_old[FILENAME_MAX];
++	char file_new[FILENAME_MAX];
++	mkfilename(file_old, E_newsdir, "oldhist.dir");
++	mkfilename(file_new, E_newsdir, "history.dir");
++	REMOVE(file_old);
++	rename(file_new, file_old);
++
++	mkfilename(file_old, E_newsdir, "oldhist.pag");
++	mkfilename(file_new, E_newsdir, "history.pag");
++	REMOVE(file_old);
++	rename(file_new, file_old);
+ }
+ 
+ /*--------------------------------------------------------------------*/
+-/*    m a i n                                                         */
++/*    m a i n																			 */
+ /*                                                                    */
+-/*    Main program                                                    */
++/*    Main program																	 */
+ /*--------------------------------------------------------------------*/
+ 
+ main( int argc, char **argv)
+ {
+-   extern char *optarg;
+-   int c;
++	extern char *optarg;
++	int c;
+ 
+ /*--------------------------------------------------------------------*/
+-/*     Report our version number and date/time compiled               */
++/*     Report our version number and date/time compiled					 */
+ /*--------------------------------------------------------------------*/
+ 
+-   debuglevel = 1;
+-   banner( argv );
++	debuglevel = 1;
++	banner( argv );
+ 
+ #if defined(__CORE__)
+-   copywrong = strdup(copyright);
+-   checkref(copywrong);
++	copywrong = strdup(copyright);
++	checkref(copywrong);
+ #endif
+ 
+ /*--------------------------------------------------------------------*/
+-/*        Process our arguments                                       */
++/*        Process our arguments													 */
+ /*--------------------------------------------------------------------*/
+ 
+-   while ((c = getopt(argc, argv, "x:")) !=  EOF)
+-      switch(c)
+-      {
+-
+-      case 'x':
+-         debuglevel = atoi( optarg );
+-         break;
+-
+-      case '?':
+-         usage();
+-         exit(1);
+-         break;
+-
+-      default:
+-         printmsg(0, "genhist - invalid option -%c", c);
+-         usage();
+-         exit(2);
+-         break;
+-   }
++	while ((c = getopt(argc, argv, "x:")) !=	EOF)
++		switch(c)
++		{
++
++		case 'x':
++			debuglevel = atoi( optarg );
++			break;
++
++		case '?':
++			usage();
++			exit(1);
++			break;
++
++		default:
++			printmsg(0, "genhist - invalid option -%c", c);
++			usage();
++			exit(2);
++			break;
++	}
+ 
+ /*--------------------------------------------------------------------*/
+ /*                             Initialize                             */
+ /*--------------------------------------------------------------------*/
+ 
+-   if (!configure( B_NEWS ))
+-      exit(1);   /* system configuration failed */
++	if (!configure( B_NEWS ))
++		exit(1);   /* system configuration failed */
+ 
+-   openlog( NULL );
++	openlog( NULL );
+ 
+-   loadActive( KWTrue );
++	loadActive( KWTrue );
+ 
+-   backupHistory();
++	backupHistory();
+ 
+ 
+-   PushDir( E_newsdir );            /* Save drive, directory name,
+-                                       creates directoryt if needed  */
++	PushDir( E_newsdir );				/* Save drive, directory name,
++													creates directoryt if needed	*/
+ 
+-   history = open_history("history");
++	history = open_history("history");
+ 
+-   IndexAll();
++	IndexAll();
+ 
+-   PopDir();
++	PopDir();
+ 
+-   close_history(history);
++	close_history(history);
+ 
+-   writeActive();
++	writeActive();
+ 
+-   printmsg(1,"%s: Processed %ld unique articles in %ld files (%ld bytes).",
+-                  argv[0], total_articles, total_files, total_bytes );
++	printmsg(1,"%s: Processed %ld unique articles in %ld files (%ld bytes).",
++						argv[0], total_articles, total_files, total_bytes );
+ 
+-   exit(0);
+-   return 0;
++	fcloseall();
++
++	exit(0);
++//   return 0;
+ 
+ } /* main */
+ 
+ /*--------------------------------------------------------------------*/
+-/*    I n d e x O n e G r o u p                                       */
++/*    I n d e x O n e G r o u p													 */
+ /*--------------------------------------------------------------------*/
+ 
+ void IndexOneGroup( const char *groupName, void *dummy )
+ {
+-   char groupdir[FILENAME_MAX];
++	char groupdir[FILENAME_MAX];
+ 
+-   printmsg(4,"IndexOneGroup: %s", groupName );
++	printmsg(4,"IndexOneGroup: %s", groupName );
+ 
+ /*--------------------------------------------------------------------*/
+-/*                     Set up the directory names                     */
++/*                     Set up the directory names							 */
+ /*--------------------------------------------------------------------*/
+ 
+-   ImportNewsGroup( groupdir, groupName, 0 );
++	ImportNewsGroup( groupdir, groupName, 0 );
+ 
+ /*--------------------------------------------------------------------*/
+ /*            Process the directory                                   */
+ /*--------------------------------------------------------------------*/
+ 
+-   IndexDirectory( groupName , groupdir );
++	IndexDirectory( groupName , groupdir );
+ 
+ } /* IndexOneGroup */
+ 
+ /*--------------------------------------------------------------------*/
+-/*    I n d e x A l l                                                 */
++/*    I n d e x A l l																 */
+ /*--------------------------------------------------------------------*/
+ 
+ static void IndexAll( void )
+ {
+ 
+-   startActiveWalk( IndexOneGroup, NULL );
++	startActiveWalk( IndexOneGroup, NULL );
+ 
+ } /* IndexAll */
+ 
+ /*--------------------------------------------------------------------*/
+-/*    G e t H i s t o r y D a t a                                     */
++/*    G e t H i s t o r y D a t a												 */
+ /*--------------------------------------------------------------------*/
+ 
+ static void GetHistoryData(const char *group,
+-                           struct direct *dp,
+-                           char *messageID,
+-                           char *histentry)
++									struct direct *dp,
++									char *messageID,
++									char *histentry)
+ {
+ 
+-   KWBoolean bXref = KWFalse;
+-   KWBoolean bMsgid = KWFalse;
+-   FILE *article = FOPEN(dp->d_name, "r", TEXT_MODE);
++	KWBoolean bXref = KWFalse;
++	KWBoolean bMsgid = KWFalse;
++	FILE *article = FOPEN(dp->d_name, "r", TEXT_MODE);
+ 
+   if ( article == NULL )
+   {
+-    printerr( dp->d_name );
+-    panic();
++	 printerr( dp->d_name );
++	 panic();
+   }
+ 
+   sprintf(histentry, "%ld %ld ", dp->d_modified, dp->d_size);
+ 
+   while ( !bXref || !bMsgid )
+   {
+-    size_t line_len;
+-    static const char messageIDLiteral[] = "Message-ID:";
+-    static const char xrefLiteral[] = "Xref:";
+-    char line[(DBM_BUFSIZ / 4) * 3];
++	 size_t line_len;
++	 static const char messageIDLiteral[] = "Message-ID:";
++	 static const char xrefLiteral[] = "Xref:";
++	 char line[(DBM_BUFSIZ / 4) * 3];
+ 
+-    if ( fgets(line, sizeof(line), article) == NULL )
+-      break;
++	 if ( fgets(line, sizeof(line), article) == NULL )
++		break;
+ 
+-    if ( (line_len = strlen(line)) <= 1 )
+-      break;
++	 if ( (line_len = strlen(line)) <= 1 )
++		break;
+ 
+-    if (line[line_len - 1] == '\n')
+-      line[(line_len--) - 1] = '\0';
++	 if (line[line_len - 1] == '\n')
++		line[(line_len--) - 1] = '\0';
+ 
+-    if (line[line_len - 1] == '\r')
+-      line[(line_len--) - 1] = '\0';
++	 if (line[line_len - 1] == '\r')
++		line[(line_len--) - 1] = '\0';
+ 
+-    if (equalni(line, messageIDLiteral, sizeof messageIDLiteral - 1))
+-    {
+-      char *ptr = line + sizeof messageIDLiteral;
++	 if (equalni(line, messageIDLiteral, sizeof messageIDLiteral - 1))
++	 {
++		char *ptr = line + sizeof messageIDLiteral;
+ 
+-      while (isspace(*ptr))
+-        ptr++;
++		while (isspace(*ptr))
++		  ptr++;
+ 
+-      strncpy(messageID, ptr, FILENAME_MAX);
+-      messageID[ FILENAME_MAX - 1] = '\0';
++		strncpy(messageID, ptr, FILENAME_MAX);
++		messageID[ FILENAME_MAX - 1] = '\0';
+ 
+-      bMsgid = KWTrue;
+-      continue;
+-    }
++		bMsgid = KWTrue;
++		continue;
++	 }
+ 
+-    if (equalni(line, xrefLiteral, sizeof xrefLiteral - 1 ))
+-    {
+-      char *ptr = line + sizeof xrefLiteral;
++	 if (equalni(line, xrefLiteral, sizeof xrefLiteral - 1 ))
++	 {
++		char *ptr = line + sizeof xrefLiteral;
+ 
+-      KWBoolean first = KWTrue;
++		KWBoolean first = KWTrue;
+ 
+-      while (isspace(*ptr))
+-        ptr++;
++		while (isspace(*ptr))
++		  ptr++;
+ 
+-      strtok(ptr, WHITESPACE); /* strip off system name */
++		strtok(ptr, WHITESPACE); /* strip off system name */
+ 
+-      while ((ptr = strtok(NULL, WHITESPACE )) != NULL)
+-      {
+-        if (!first)
+-          strcat(histentry, ",");
++		while ((ptr = strtok(NULL, WHITESPACE )) != NULL)
++		{
++		  if (!first)
++			 strcat(histentry, ",");
+ 
+-        first = KWFalse;
+-        strcat(histentry, ptr);
+-      }
++		  first = KWFalse;
++		  strcat(histentry, ptr);
++		}
+ 
+-      bXref = KWTrue;
+-      continue;
++		bXref = KWTrue;
++		continue;
+ 
+-    }
++	 }
+ 
+   } /* while ( !bXref || !bMsgid ) */
+ 
+   fclose(article);
+ 
+   if ( !bXref )
+-    sprintf(histentry, "%ld %ld %s:%s",
+-            dp->d_modified, dp->d_size, group, dp->d_name);
++	 sprintf(histentry, "%ld %ld %s:%s",
++				dp->d_modified, dp->d_size, group, dp->d_name);
+ 
+ } /* GetHistoryData */
+ 
+ /*--------------------------------------------------------------------*/
+-/*    I n d e x D i r e c t o r y                                     */
++/*    I n d e x D i r e c t o r y												 */
+ /*--------------------------------------------------------------------*/
+ 
+ static void IndexDirectory( const char *groupName,
+-                            const char *directory )
++									 const char *directory )
+ {
+-   long number;
++	long number;
+ 
+-   long articles = 0;
+-   long files = 0;
+-   long bytes = 0;
++	long articles = 0;
++	long files = 0;
++	long bytes = 0;
+ 
+-   DIR *dirp;
+-   struct direct *dp;
++	DIR *dirp;
++	struct direct *dp;
+ 
+ /*--------------------------------------------------------------------*/
+-/*                Open up the directory for processing                */
++/*                Open up the directory for processing					 */
+ /*--------------------------------------------------------------------*/
+ 
+-   if ((dirp = opendirx(directory,"*.*")) == nil(DIR))
+-   {
+-      printmsg(5, "IndexDirectory: couldn't opendir() %s", directory);
+-      return;
+-   } /* if */
++	if ((dirp = opendirx(directory,"*.*")) == nil(DIR))
++	{
++		printmsg(5, "IndexDirectory: couldn't opendir() %s", directory);
++		return;
++	} /* if */
+ 
+ /*--------------------------------------------------------------------*/
+ /*                 Switch to directory for processing                 */
+ /*--------------------------------------------------------------------*/
+ 
+-   CHDIR( directory );
++	CHDIR( directory );
+ 
+ /*--------------------------------------------------------------------*/
+-/*              Look for the next file in the directory               */
++/*              Look for the next file in the directory					 */
+ /*--------------------------------------------------------------------*/
+ 
+-   while((dp = readdir(dirp)) != nil(struct direct))
+-   {
++	while((dp = readdir(dirp)) != nil(struct direct))
++	{
+ 
+ /*--------------------------------------------------------------------*/
+-/*                      Add this file to history?                     */
++/*                      Add this file to history?							 */
+ /*--------------------------------------------------------------------*/
+ 
+-      if ( numeric( dp->d_name ))/* Article format name?             */
+-      {                          /* Yes --> Examine it closer        */
+-         char messageID[FILENAME_MAX];
+-         char histentry[DBM_BUFSIZ];
++		if ( numeric( dp->d_name ))/* Article format name?             */
++		{									/* Yes --> Examine it closer			*/
++			char messageID[FILENAME_MAX];
++			char histentry[DBM_BUFSIZ];
+ 
+-         number = atol(dp->d_name);
++			number = atol(dp->d_name);
+ 
+-         printmsg(6,"Processing file %s from %s",
+-                 dp->d_name, dater( dp->d_modified, NULL));
++			printmsg(6,"Processing file %s from %s",
++					  dp->d_name, dater( dp->d_modified, NULL));
+ 
+-         GetHistoryData(groupName, dp, messageID, histentry);
++			GetHistoryData(groupName, dp, messageID, histentry);
+ 
+-         if ( add_histentry(history, messageID, histentry) )
+-            articles++;
++			if ( add_histentry(history, messageID, histentry) )
++				articles++;
+ 
+ /*--------------------------------------------------------------------*/
+-/*                    Update ACTIVE file as well.                     */
++/*                    Update ACTIVE file as well.							 */
+ /*--------------------------------------------------------------------*/
+ 
+-         if (number < getArticleOldest( groupName ))
+-            setArticleOldest( groupName, number );
++			if (number < getArticleOldest( groupName ))
++				setArticleOldest( groupName, number );
+ 
+-         if (number > getArticleNewest( groupName ))
+-            setArticleNewest( groupName, number );
++			if (number > getArticleNewest( groupName ))
++				setArticleNewest( groupName, number );
+ 
+-        files++;
+-        bytes += dp->d_size;
++		  files++;
++		  bytes += dp->d_size;
+ 
+-      } /* if ( numeric( dp->d_name )) */
++		} /* if ( numeric( dp->d_name )) */
+ 
+-   } /* while */
++	} /* while */
+ 
+ /*--------------------------------------------------------------------*/
+-/*           Close up the directory and report what we did            */
++/*           Close up the directory and report what we did				 */
+ /*--------------------------------------------------------------------*/
+ 
+-   closedir(dirp);
++	closedir(dirp);
+ 
+-   printmsg(files ? 2 : 3,"%s: %ld unique and %ld cross-posted articles "
+-                  "in %ld files (%ld bytes)",
+-                  groupName,
+-                  articles,
+-                  files - articles,
+-                  files,
+-                  bytes);
++	printmsg(files ? 2 : 3,"%s: %ld unique and %ld cross-posted articles "
++						"in %ld files (%ld bytes)",
++						groupName,
++						articles,
++						files - articles,
++						files,
++						bytes);
+ 
+-   if ((bflag[F_PURGE] && ( files == 0 )) )
+-   {
+-      CHDIR( E_newsdir );           /* Can't delete directory if CWD  */
+-      if ( rmdir( (char *) directory ))
+-         printerr( directory );
+-      else {
+-         printmsg(1,"Deleted directory for empty group %s (directory %s)",
+-                     groupName,
+-                     directory );
+-      }
+-   }
++	if ((bflag[F_PURGE] && ( files == 0 )) )
++	{
++		CHDIR( E_newsdir );				/* Can't delete directory if CWD  */
++		if ( rmdir( (char *) directory ))
++			printerr( directory );
++		else {
++			printmsg(1,"Deleted directory for empty group %s (directory %s)",
++							groupName,
++							directory );
++		}
++	}
+ 
+-   total_articles += articles;
+-   total_files += files;
+-   total_bytes += bytes;
++	total_articles += articles;
++	total_files += files;
++	total_bytes += bytes;
+ 
+ } /* IndexDirectory */
+ 
+ /*--------------------------------------------------------------------*/
+-/*    n u m e r i c                                                   */
++/*    n u m e r i c																	 */
+ /*                                                                    */
+-/*    Examines string, returns true if numeric with period            */
++/*    Examines string, returns true if numeric with period				 */
+ /*--------------------------------------------------------------------*/
+ 
+ static KWBoolean numeric( char *start)
+ {
+-   char *number = start;
++	char *number = start;
+ 
+-   while (*number != '\0')
+-   {
+-      if (!isdigit(*number) && (*number != '.'))
+-         return KWFalse;
++	while (*number != '\0')
++	{
++		if (!isdigit(*number) && (*number != '.'))
++			return KWFalse;
+ 
+-      number++;
+-   }
++		number++;
++	}
+ 
+-   return KWTrue;
++	return KWTrue;
+ 
+ } /* numeric */
+ 
+ /*--------------------------------------------------------------------*/
+-/*    u s a g e                                                       */
++/*    u s a g e																		 */
+ /*                                                                    */
+-/*    Print usage of program                                          */
++/*    Print usage of program														 */
+ /*--------------------------------------------------------------------*/
+ 
+ static void usage( void )
+ {
+-   printf( "Usage:   genhist\t[-x debuglevel]\n");
+-   exit(1);
++	printf( "Usage:   genhist\t[-x debuglevel]\n");
++	exit(1);
+ } /* usage */
+--- e:\uupc1.12s\source\news\history.c	Wed Apr 23 19:56:54 1997
++++ history.c	Thu Aug 21 19:57:36 1997
+@@ -1,24 +1,24 @@
+ /*--------------------------------------------------------------------*/
+ /*    h i s t o r y . c                                               */
+ /*                                                                    */
+-/*    News history file maintenance for UUPC/extended.                */
++/*    News history file maintenance for UUPC/extended.					 */
+ /*--------------------------------------------------------------------*/
+ 
+ /*--------------------------------------------------------------------*/
+-/*       Changes Copyright (c) 1989-1997 by Kendra Electronic         */
+-/*       Wonderworks.                                                 */
++/*       Changes Copyright (c) 1989-1997 by Kendra Electronic			 */
++/*       Wonderworks.																 */
+ /*                                                                    */
+-/*       All rights reserved except those explicitly granted by       */
+-/*       the UUPC/extended license agreement.                         */
++/*       All rights reserved except those explicitly granted by		 */
++/*       the UUPC/extended license agreement.								 */
+ /*--------------------------------------------------------------------*/
+ 
+ /*--------------------------------------------------------------------*/
+-/*                          RCS Information                           */
++/*                          RCS Information									 */
+ /*--------------------------------------------------------------------*/
+ 
+ /* new version, rewritten for history-based news database
+  *
+- * Author:  Kai Uwe Rommel <rommel@ars.muc.de>
++ * Author:	Kai Uwe Rommel <rommel@ars.muc.de>
+  * Created: Sun Aug 15 1993
+  */
+ 
+@@ -27,33 +27,33 @@
+ 
+ /*
+  * $Log: history.c $
+- * Revision 1.18  1997/04/24 00:56:54  ahd
++ * Revision 1.18	1997/04/24 00:56:54	ahd
+  * Delete MAKEBUF/FREEBUF support
+  *
+- * Revision 1.17  1996/11/18 04:46:49  ahd
++ * Revision 1.17	1996/11/18 04:46:49	ahd
+  * Normalize arguments to bugout
+  * Reset title after exec of sub-modules
+  * Normalize host status names to use HS_ prefix
+  *
+- * Revision 1.16  1996/01/01 21:08:58  ahd
++ * Revision 1.16	1996/01/01 21:08:58	ahd
+  * Annual Copyright Update
+  *
+- * Revision 1.15  1995/12/12 13:55:40  ahd
++ * Revision 1.15	1995/12/12 13:55:40	ahd
+  * Clean up log format
+  *
+- * Revision 1.14  1995/12/03 13:51:44  ahd
++ * Revision 1.14	1995/12/03 13:51:44	ahd
+  * Additional debugging cleanup
+  *
+- * Revision 1.13  1995/12/02 14:18:33  ahd
++ * Revision 1.13	1995/12/02 14:18:33	ahd
+  * Use longer buffers, add new debugging messages
+  *
+- * Revision 1.12  1995/03/11 22:29:41  ahd
++ * Revision 1.12	1995/03/11 22:29:41	ahd
+  * Use macro for file delete to allow special OS/2 processing
+  *
+- * Revision 1.11  1995/03/11 01:59:57  ahd
++ * Revision 1.11	1995/03/11 01:59:57	ahd
+  * Return result of cancel to caller to allow message
+  *
+- * Revision 1.10  1995/01/29 14:03:29  ahd
++ * Revision 1.10	1995/01/29 14:03:29	ahd
+  * Clean up IBM C/Set compiler warnings
+  *
+  * Revision 1.9  1995/01/07 16:21:23  ahd
+@@ -70,30 +70,30 @@
+  * Clean yp RCS information
+  * patches from Kai Uwe Rommel
+  *
+- * Revision 1.5  1994/02/19  04:21:49  ahd
++ * Revision 1.5  1994/02/19  04:21:49	ahd
+  * Use standard first header
+  *
+- * Revision 1.5  1994/02/19  04:21:49  ahd
++ * Revision 1.5  1994/02/19  04:21:49	ahd
+  * Use standard first header
+  *
+- * Revision 1.4  1994/01/18  13:29:22  ahd
++ * Revision 1.4  1994/01/18  13:29:22	ahd
+  * Add standard UUPC/extended error logging routines for run time
+  * library errors
+  *
+- * Revision 1.3  1993/11/06  17:54:55  rhg
++ * Revision 1.3  1993/11/06  17:54:55	rhg
+  * Drive Drew nuts by submitting cosmetic changes mixed in with bug fixes
+  *
+- * Revision 1.2  1993/10/30  11:39:26  rommel
++ * Revision 1.2  1993/10/30  11:39:26	rommel
+  * fixed some function error returns missing a value
+  *
+- * Revision 1.1  1993/09/05  10:56:49  rommel
++ * Revision 1.1  1993/09/05  10:56:49	rommel
+  * Initial revision
+  * */
+ 
+ 
+ 
+ /*--------------------------------------------------------------------*/
+-/*                        System include files                        */
++/*                        System include files								 */
+ /*--------------------------------------------------------------------*/
+ 
+ #include "uupcmoah.h"
+@@ -102,7 +102,7 @@
+ #include <sys/stat.h>
+ 
+ /*--------------------------------------------------------------------*/
+-/*                    UUPC/extended include files                     */
++/*                    UUPC/extended include files							 */
+ /*--------------------------------------------------------------------*/
+ 
+ #include "timestmp.h"
+@@ -115,30 +115,34 @@
+ 
+ currentfile();
+ 
++#ifndef min
++#define min(x,y) (((x) < (y)) ? (x) : (y))
++#endif
++
+ /*--------------------------------------------------------------------*/
+ /*    o p e n _ h i s t o r y                                         */
+ /*                                                                    */
+-/*    Open the history file.                                          */
++/*    Open the history file.														 */
+ /*--------------------------------------------------------------------*/
+ 
+ DBM *open_history(char *name)
+ {
+-   char hfile_name[ FILENAME_MAX ];
+-   DBM *hdbm_file = NULL;
++	char hfile_name[ FILENAME_MAX ];
++	DBM *hdbm_file = NULL;
+ 
+-   mkfilename(hfile_name, E_newsdir, name);
+-   hdbm_file = dbm_open(hfile_name, O_RDWR | O_CREAT, 0666);
++	mkfilename(hfile_name, E_newsdir, name);
++	hdbm_file = dbm_open(hfile_name, O_RDWR | O_CREAT, 0666);
+ 
+-   if (hdbm_file == NULL) {
+-      printmsg(0,"Unable to open history file");
+-      return NULL;
+-   }
++	if (hdbm_file == NULL) {
++		printmsg(0,"Unable to open history file");
++		return NULL;
++	}
+ 
+-   return hdbm_file;
++	return hdbm_file;
+ }
+ 
+ /*--------------------------------------------------------------------*/
+-/*    c l o s e _ h i s t o r y                                       */
++/*    c l o s e _ h i s t o r y													 */
+ /*                                                                    */
+ /*    Close the history file.                                         */
+ /*--------------------------------------------------------------------*/
+@@ -146,13 +150,13 @@
+ void close_history(DBM *hdbm_file)
+ {
+   if (hdbm_file != NULL)
+-    dbm_close(hdbm_file);
++	 dbm_close(hdbm_file);
+ }
+ 
+ /*--------------------------------------------------------------------*/
+-/*    g e t _ h i s t e n t r y                                       */
++/*    g e t _ h i s t e n t r y													 */
+ /*                                                                    */
+-/*    Check whether messageID is already in the history file.         */
++/*    Check whether messageID is already in the history file.			 */
+ /*--------------------------------------------------------------------*/
+ 
+ char *get_histentry(DBM *hdbm_file, const char *messageID)
+@@ -160,7 +164,7 @@
+   datum key, val;
+ 
+   if (hdbm_file == NULL)
+-    return NULL;
++	 return NULL;
+ 
+   key.dptr = (char *) messageID;
+   key.dsize = strlen(key.dptr) + 1;
+@@ -173,21 +177,21 @@
+ /*--------------------------------------------------------------------*/
+ /*    g e t _ * _ h i s t e n t r y                                   */
+ /*                                                                    */
+-/*    Retrieve all entries from the history file in order.            */
++/*    Retrieve all entries from the history file in order.				 */
+ /*--------------------------------------------------------------------*/
+ 
+ static int get_entry(DBM *hdbm_file, char **messageID, char **histentry,
+-                     datum (*dbm_getkey)(DBM *hdbm_file))
++							datum (*dbm_getkey)(DBM *hdbm_file))
+ {
+   datum key, val;
+ 
+   if (hdbm_file == NULL)
+-    return KWFalse;
++	 return KWFalse;
+ 
+   key = dbm_getkey(hdbm_file);
+ 
+   if (key.dptr == NULL)
+-    return KWFalse;
++	 return KWFalse;
+ 
+   val = dbm_fetch(hdbm_file, key);
+ 
+@@ -208,14 +212,14 @@
+ }
+ 
+ /*--------------------------------------------------------------------*/
+-/*    a d d _ h i s t e n t r y                                       */
++/*    a d d _ h i s t e n t r y													 */
+ /*                                                                    */
+-/*    Add messageID to the history file.                              */
++/*    Add messageID to the history file.										 */
+ /*--------------------------------------------------------------------*/
+ 
+ int add_histentry(DBM *hdbm_file,
+-                  const char *messageID,
+-                  const char *hist_record)
++						const char *messageID,
++						const char *hist_record)
+ {
+   datum key, val;
+ 
+@@ -223,11 +227,11 @@
+   {
+ 
+ #ifdef UDEBUG
+-     printmsg(2,"add_histentry: Invalid call, no file passed");
+-     panic();
++	  printmsg(2,"add_histentry: Invalid call, no file passed");
++	  panic();
+ #endif
+ 
+-    return KWFalse;
++	 return KWFalse;
+   }
+ 
+   key.dptr = (char *) messageID;
+@@ -237,27 +241,27 @@
+ 
+ /*--------------------------------------------------------------------*/
+ /*       Since the DBM_REPLACE keyword doesn't actually work, any     */
+-/*       attempt to replace a history record will fail.  Thus, we     */
+-/*       don't actually bother to print the error message below.      */
++/*       attempt to replace a history record will fail.	Thus, we     */
++/*       don't actually bother to print the error message below.		 */
+ /*--------------------------------------------------------------------*/
+ 
+   if (dbm_store(hdbm_file, key, val, DBM_REPLACE))
+   {
+ 
+ #ifdef UDEBUG2
+-     printmsg(2,"add_histentry: dbm_store failed for %s", messageID);
++	  printmsg(2,"add_histentry: dbm_store failed for %s", messageID);
+ #endif
+ 
+-    return KWFalse;
++	 return KWFalse;
+   }
+ 
+   return KWTrue;
+ }
+ 
+ /*--------------------------------------------------------------------*/
+-/*    d e l e t e _ h i s t e n t r y                                 */
++/*    d e l e t e _ h i s t e n t r y											 */
+ /*                                                                    */
+-/*    Delete messageID from the history file.                         */
++/*    Delete messageID from the history file.								 */
+ /*--------------------------------------------------------------------*/
+ 
+ int delete_histentry(DBM *hdbm_file, const char *messageID)
+@@ -265,21 +269,21 @@
+   datum key;
+ 
+   if (hdbm_file == NULL)
+-    return KWFalse;
++	 return KWFalse;
+ 
+   key.dptr = (char *) messageID;
+   key.dsize = strlen(key.dptr) + 1;
+ 
+   if (dbm_delete(hdbm_file, key))
+-    return KWFalse;
++	 return KWFalse;
+ 
+   return KWTrue;
+ }
+ 
+ /*--------------------------------------------------------------------*/
+-/*    c o u n t _ p o s t i n g s                                     */
++/*    c o u n t _ p o s t i n g s												 */
+ /*                                                                    */
+-/*    Count number of postings in a history entry                     */
++/*    Count number of postings in a history entry							 */
+ /*--------------------------------------------------------------------*/
+ 
+ int count_postings(char *histentry)
+@@ -290,16 +294,16 @@
+ 
+   checkref( value );
+   strcpy(value, histentry);
+-  strtok(value, " ");   /* strip off date */
++  strtok(value, " ");	/* strip off date */
+   strtok(NULL, " ");    /* strip off size */
+   count = 0;
+ 
+   while ((ptr = strtok(NULL, " ,\n")) != NULL)
+   {
+-    num = strchr(ptr, ':') + 1;
++	 num = strchr(ptr, ':') + 1;
+ 
+-    if (atol(num))
+-      count++;
++	 if (atol(num))
++		count++;
+   }
+ 
+   free( value );
+@@ -312,33 +316,33 @@
+   KWBoolean subgroups;
+ 
+   if (grouplist == NULL)
+-    return KWTrue;
++	 return KWTrue;
+ 
+   for (; *grouplist != NULL; grouplist++)
+   {
+-    size_t len2 = strlen(*grouplist);
+-    subgroups = KWFalse;
++	 size_t len2 = strlen(*grouplist);
++	 subgroups = KWFalse;
+ 
+-    if (len2 && ((*grouplist)[len2 - 1] == '*'))
+-    {
+-       len2--;
+-       subgroups = KWTrue;
+-    }
+-
+-    if (strnicmp(group, *grouplist, min(len1, len2)) == 0)
+-    {
+-      if (len1 < len2)
+-        continue;
+-      else if (len1 == len2)
+-        return KWTrue;
+-      else /* len1 > len2 */
+-      {
+-        if (group[len2] == '.' && subgroups)
+-          return KWTrue;
+-      }
++	 if (len2 && ((*grouplist)[len2 - 1] == '*'))
++	 {
++		 len2--;
++		 subgroups = KWTrue;
++	 }
++
++	 if (strnicmp(group, *grouplist, min(len1, len2)) == 0)
++	 {
++		if (len1 < len2)
++		  continue;
++		else if (len1 == len2)
++		  return KWTrue;
++		else /* len1 > len2 */
++		{
++		  if (group[len2] == '.' && subgroups)
++			 return KWTrue;
++		}
+ 
+-      return KWTrue;
+-    }
++		return KWTrue;
++	 }
+   }
+ 
+   return KWFalse;
+@@ -346,28 +350,34 @@
+ } /* matches */
+ 
+ /*--------------------------------------------------------------------*/
+-/*    p u r g e _ a r t i c l e                                       */
++/*    p u r g e _ a r t i c l e													 */
+ /*                                                                    */
+ /*    Actually delete an article's file(s) and return remaining ones. */
+ /*--------------------------------------------------------------------*/
+ 
+ char *purge_article(char *histentry, char **groups)
+ {
+-  static char *remain = NULL;
+-  size_t len  = strlen( histentry ) + 1;
+-  char value[ DBM_BUFSIZ ];
+-  char filename[ FILENAME_MAX ];
+-  char *group, *num;
+-  long article, remaining;
++	static char *remain = NULL;
++	size_t len	= strlen( histentry ) + 1;
++	char value[ DBM_BUFSIZ ];
++	char filename[ FILENAME_MAX ];
++	char *group, *num;
++	long article, remaining;
++	struct stat statBuf;
++	int rc;
+ 
+   if ( remain == NULL )
+   {
+-      remain = (char *) malloc( DBM_BUFSIZ );
+-      checkref( remain );
++		remain = (char *) malloc( DBM_BUFSIZ );
++		checkref( remain );
+   }
+ 
++#ifdef DEBUG
++	printmsg(10, "Entering purge_article()");
++#endif
++
+   strcpy(value, histentry);
+-  num = strtok(value, " ");     /* strip off date */
++  num = strtok(value, " ");	  /* strip off date */
+   strcpy(remain, num);
+   strcat(remain, " ");
+   num = strtok(NULL, " ");      /* strip off size */
+@@ -377,39 +387,61 @@
+ 
+   while ((group = strtok(NULL, " ,\n")) != NULL)
+   {
+-    num = strchr(group, ':');
+-    *num++ = 0;
++	 num = strchr(group, ':');
++	 *num++ = 0;
+ 
+-    if (matches(group, groups))
+-    {
+-      if ((article = atol(num)) != 0)
+-      {
+-        ImportNewsGroup(filename, group, article);
+-        REMOVE(filename);
+-      }
+-    }
+-    else
+-    {
+-      strcat(remain, remaining ? "," : "");
+-      strcat(remain, group);
+-      strcat(remain, ":");
+-      strcat(remain, num);
+-      remaining++;
++		if (matches(group, groups))
++		{
++			if ((article = atol(num)) != 0)
++			{
++				ImportNewsGroup(filename, group, article);
++
++				rc = stat(filename, &statBuf);
++#ifdef DEBUG
++				printmsg(10, "stat(%s, statBuf) returns %lu", filename, rc);
++				fflush(stderr);
++#endif
++				/* One way to check if the file already exists */
++				if(rc == 0)
++				{
++#ifdef DEBUG
++					printmsg(10, "attempting to remove file %s", filename);
++#endif
++					REMOVE(filename);
++#ifdef DEBUG
++					printmsg(10, "back from removing file");
++#endif
++				}
++#ifdef DEBUG
++				else
++				{
++					printmsg(10, "not attempting to remove file %s", filename);
++				}
++#endif
++		}
++	 }
++	 else
++	 {
++		strcat(remain, remaining ? "," : "");
++		strcat(remain, group);
++		strcat(remain, ":");
++		strcat(remain, num);
++		remaining++;
+ 
+-    }   /* else */
++	 }   /* else */
+ 
+   } /* while ((group = strtok(NULL, " ,\n")) != NULL) */
+ 
+ /*--------------------------------------------------------------------*/
+-/*       If no articles remain name, free the persistent buffer       */
+-/*       and return a NULL to the caller; otherwise, just return      */
+-/*       the list.                                                    */
++/*       If no articles remain name, free the persistent buffer		 */
++/*       and return a NULL to the caller; otherwise, just return		 */
++/*       the list.																	 */
+ /*--------------------------------------------------------------------*/
+ 
+   if ( ! remaining )
+   {
+-      free( remain );
+-      remain = NULL;
++		free( remain );
++		remain = NULL;
+   }
+ 
+   return remain;
+@@ -417,9 +449,9 @@
+ } /* purge_article */
+ 
+ /*--------------------------------------------------------------------*/
+-/*    c a n c e l _ a r t i c l e                                     */
++/*    c a n c e l _ a r t i c l e												 */
+ /*                                                                    */
+-/*    Cancel an article in the database                               */
++/*    Cancel an article in the database										 */
+ /*--------------------------------------------------------------------*/
+ 
+ KWBoolean
+@@ -429,7 +461,7 @@
+   char *groups;
+ 
+   if (hdbm_file == NULL)
+-    return KWFalse;
++	 return KWFalse;
+ 
+   key.dptr = (char *) messageID;
+   key.dsize = strlen(key.dptr) + 1;
+@@ -438,15 +470,15 @@
+ 
+   if (val.dptr == NULL)
+   {
+-    printmsg(4,"Cannot find article to cancel in history");
+-    return KWFalse;
++	 printmsg(4,"Cannot find article to cancel in history");
++	 return KWFalse;
+   }
+ 
+-    groups = strchr(val.dptr, ' ') + 1;  /* date */
+-    groups = strchr(groups, ' ') + 1;    /* size */
+-    printmsg(0,"cancelling %s", groups);
+-    purge_article(val.dptr, NULL);
+-    delete_histentry(hdbm_file, messageID);
++	 groups = strchr(val.dptr, ' ') + 1;  /* date */
++	 groups = strchr(groups, ' ') + 1;	  /* size */
++	 printmsg(0,"cancelling %s", groups);
++	 purge_article(val.dptr, NULL);
++	 delete_histentry(hdbm_file, messageID);
+ 
+   return KWTrue;
+ 

@@ -1,0 +1,28 @@
+ * Change log:
+ *
+ * Version .003:
+ *
+ * 21 Aug 97:
+ *             Looks like the patched expire.exe is working now.
+ *             By trying to fix the one bug, I accidently created
+ *             another.  I redefined the stat buffer as a nonpointer,
+ *             which keeps it from crashing.  Now, I just need to
+ *             test it out for a few days to make sure it actually
+ *             solves the problem.
+ *
+ * 11 Aug 97:  Finally got around to fixing the dbz log so that it
+ *             actually writes to "Spool\dbz.log" instead of the
+ *             default "UUPC\extended.log".  Improved logging so
+ *             that debug level 5 will log all of the transactions
+ *             that dbz could/could not make.
+ *
+ * Version .002:
+ *
+ * 9 Aug 97:   Added lock file mechanism so program would not run when
+ *             UUXQT is already running.  Changed and added more exit
+ *             codes:  1 means not found (-x and -m switches only).
+ *             A "not found" for -m really means that it is not missing.
+ *             When using -x, the program now spits back the key and the
+ *             entries!  This is not a minor change, and may break some
+ *             programs.
+

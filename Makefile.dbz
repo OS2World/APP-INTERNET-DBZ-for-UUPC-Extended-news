@@ -1,0 +1,466 @@
+#
+# emx dmake Makefile for dbz for UUPC/Extended.  See README file for
+# details.
+#
+# Created by John Carmack.
+#
+# Note that UUPC/Extended, by default, is setup to remake everything
+# every time.	Run "dmake expirequick" to only compile expire or
+# "dmake dbzquick" to only compile dbz.  This will NOT check the libraries!
+#
+
+.IF $(DEBUG) == 1
+CFLAGS = -g -D__OS2__ -D__GCC__ -DDEBUG -DUDEBUG
+.ELSE
+CFLAGS = -g -D__OS2__ -D__GCC__
+.ENDIF
+
+CC = gcc
+
+.c.o:
+	$(CC) $(CFLAGS) -c $<
+
+H = .h
+C = .c
+O = .o
+
+TARGET1 = dbz.exe
+TARGET2 = expire.exe
+LIBDIR = lib
+NEWSDIR = news
+
+LOBJS1 = $(LIBDIR)\{abspath arbmath arpadate bugout catcher chdir checkptr \
+	configur dater dos2unix execute expath export filebkup fopen \
+	getargs getdrive getseq hostable hostatus hostrset}$(O)
+
+LOBJS2 = $(LIBDIR)\{imfile import kanjicnv lock logger mkdir mkfilenm \
+	mkmbox mktempnm ndiros2 normaliz pos2err \
+	printmsg printerr pushpop readnext remove2 rename safeio safeout}$(O)
+
+LOBJS3 = $(LIBDIR)\{scrsize2 security ssleep stater strlwr strpool \
+	timestmp title2 usertabl usrcatch validcmd}$(O)
+
+LIBS = $(LOBJS1) $(LOBJS2) $(LOBJS3)
+
+OBJS = $(NEWSDIR)\{active history importng hdbm idx cache}$(O)
+
+DBZOBJ = $(NEWSDIR)\dbz$(O)
+
+EXPIREOBJ = $(NEWSDIR)\expire$(O)
+
+all: $(LIBS) $(OBJS) $(DBZOBJ) $(EXPIREOBJ)
+	@echo Directory is now $(PWD)
+	$(CC) $(CFLAGS) -o $(TARGET1) $(DBZOBJ) $(OBJS) $(LIBS) $(DEFS)
+	$(CC) $(CFLAGS) -o $(TARGET2) $(EXPIREOBJ) $(OBJS) $(LIBS) $(DEFS)
+
+dbz: $(LIBS) $(OBJS) $(DBZOBJ)
+	@echo Directory is now $(PWD)
+	$(CC) $(CFLAGS) -o $(TARGET1) $(DBZOBJ) $(OBJS) $(LIBS) $(DEFS)
+
+expire: $(LIBS) $(OBJS) $(EXPIREOBJ)
+	@echo Directory is now $(PWD)
+	$(CC) $(CFLAGS) -o $(TARGET2) $(EXPIREOBJ) $(OBJS)  $(LIBS) $(DEFS)
+
+dbzquick: $(DBZOBJ)
+	@echo Directory is now $(PWD)
+	$(CC) $(CFLAGS) -o $(TARGET1) $(DBZOBJ) $(OBJS) $(LIBS) $(DEFS)
+
+expirequick: $(EXPIREOBJ)
+	@echo Directory is now $(PWD)
+	$(CC) $(CFLAGS) -o $(TARGET2) $(EXPIREOBJ) $(OBJS) $(LIBS) $(DEFS)
+
+$(NEWSDIR)\dbz$(O) .SETDIR=$(NEWSDIR): dbz$(C)
+	@echo Directory is now $(PWD)
+	$(CC) $(CFLAGS) -c $<
+
+$(NEWSDIR)\expire$(O) .SETDIR=$(NEWSDIR): expire$(C)
+	@echo Directory is now $(PWD)
+	$(CC) $(CFLAGS) -c $<
+
+$(LIBDIR)\abspath$(O) .SETDIR=$(LIBDIR): abspath$(C)
+	@echo Directory is now $(PWD)
+	$(CC) $(CFLAGS) -c $<
+
+$(LIBDIR)\arbmath$(O) .SETDIR=$(LIBDIR): arbmath$(C)
+	$(CC) $(CFLAGS) -c $<
+
+$(LIBDIR)\arpadate$(O) .SETDIR=$(LIBDIR): arpadate$(C)
+	$(CC) $(CFLAGS) -c $<
+
+$(LIBDIR)\bugout$(O) .SETDIR=$(LIBDIR): bugout$(C)
+	$(CC) $(CFLAGS) -c $<
+
+$(LIBDIR)\catcher$(O) .SETDIR=$(LIBDIR): catcher$(C)
+	$(CC) $(CFLAGS) -c $<
+
+$(LIBDIR)\chdir$(O) .SETDIR=$(LIBDIR): chdir$(C)
+	$(CC) $(CFLAGS) -c $<
+
+$(LIBDIR)\checkptr$(O) .SETDIR=$(LIBDIR): checkptr$(C)
+	$(CC) $(CFLAGS) -c $<
+
+$(LIBDIR)\configur$(O) .SETDIR=$(LIBDIR): configur$(C)
+	$(CC) $(CFLAGS) -c $<
+
+$(LIBDIR)\dater$(O) .SETDIR=$(LIBDIR): dater$(C)
+	$(CC) $(CFLAGS) -c $<
+
+$(LIBDIR)\dos2unix$(O) .SETDIR=$(LIBDIR): dos2unix$(C)
+	$(CC) $(CFLAGS) -c $<
+
+$(LIBDIR)\execute$(O) .SETDIR=$(LIBDIR): execute$(C)
+	$(CC) $(CFLAGS) -c $<
+
+$(LIBDIR)\expath$(O) .SETDIR=$(LIBDIR): expath$(C)
+	$(CC) $(CFLAGS) -c $<
+
+$(LIBDIR)\export$(O) .SETDIR=$(LIBDIR): export$(C)
+	$(CC) $(CFLAGS) -c $<
+
+$(LIBDIR)\filebkup$(O) .SETDIR=$(LIBDIR): filebkup$(C)
+	$(CC) $(CFLAGS) -c $<
+
+$(LIBDIR)\fopen$(O) .SETDIR=$(LIBDIR): fopen$(C)
+	$(CC) $(CFLAGS) -c $<
+
+$(LIBDIR)\getargs$(O) .SETDIR=$(LIBDIR): getargs$(C)
+	$(CC) $(CFLAGS) -c $<
+
+$(LIBDIR)\getdrive$(O) .SETDIR=$(LIBDIR): getdrive$(C)
+	$(CC) $(CFLAGS) -c $<
+
+$(LIBDIR)\getseq$(O) .SETDIR=$(LIBDIR): getseq$(C)
+	$(CC) $(CFLAGS) -c $<
+
+$(LIBDIR)\hostable$(O) .SETDIR=$(LIBDIR): hostable$(C)
+	$(CC) $(CFLAGS) -c $<
+
+$(LIBDIR)\hostatus$(O) .SETDIR=$(LIBDIR): hostatus$(C)
+	$(CC) $(CFLAGS) -c $<
+
+$(LIBDIR)\hostrset$(O) .SETDIR=$(LIBDIR): hostrset$(C)
+	$(CC) $(CFLAGS) -c $<
+
+$(LIBDIR)\imfile$(O) .SETDIR=$(LIBDIR): imfile$(C)
+	$(CC) $(CFLAGS) -c $<
+
+$(LIBDIR)\import$(O) .SETDIR=$(LIBDIR): import$(C)
+	$(CC) $(CFLAGS) -c $<
+
+$(LIBDIR)\kanjicnv$(O) .SETDIR=$(LIBDIR): kanjicnv$(C)
+	$(CC) $(CFLAGS) -c $<
+
+$(LIBDIR)\lock$(O) .SETDIR=$(LIBDIR): lock$(C)
+	$(CC) $(CFLAGS) -c $<
+
+$(LIBDIR)\logger$(O) .SETDIR=$(LIBDIR): logger$(C)
+	$(CC) $(CFLAGS) -c $<
+
+$(LIBDIR)\mkdir$(O) .SETDIR=$(LIBDIR): mkdir$(C)
+	$(CC) $(CFLAGS) -c $<
+
+$(LIBDIR)\mkfilenm$(O) .SETDIR=$(LIBDIR): mkfilenm$(C)
+	$(CC) $(CFLAGS) -c $<
+
+$(LIBDIR)\mkmbox$(O) .SETDIR=$(LIBDIR): mkmbox$(C)
+	$(CC) $(CFLAGS) -c $<
+
+$(LIBDIR)\mktempnm$(O) .SETDIR=$(LIBDIR): mktempnm$(C)
+	$(CC) $(CFLAGS) -c $<
+
+$(LIBDIR)\ndiros2$(O) .SETDIR=$(LIBDIR): ndiros2$(C)
+	$(CC) $(CFLAGS) -c $<
+
+$(LIBDIR)\normaliz$(O) .SETDIR=$(LIBDIR): normaliz$(C)
+	$(CC) $(CFLAGS) -c $<
+
+$(LIBDIR)\pos2err$(O) .SETDIR=$(LIBDIR): pos2err$(C)
+	$(CC) $(CFLAGS) -c $<
+
+$(LIBDIR)\printmsg$(O) .SETDIR=$(LIBDIR): printmsg$(C)
+	$(CC) $(CFLAGS) -c $<
+
+$(LIBDIR)\printerr$(O) .SETDIR=$(LIBDIR): printerr$(C)
+	$(CC) $(CFLAGS) -c $<
+
+$(LIBDIR)\pushpop$(O) .SETDIR=$(LIBDIR): pushpop$(C)
+	$(CC) $(CFLAGS) -c $<
+
+$(LIBDIR)\readnext$(O) .SETDIR=$(LIBDIR): readnext$(C)
+	$(CC) $(CFLAGS) -c $<
+
+$(LIBDIR)\remove2$(O) .SETDIR=$(LIBDIR): remove2$(C)
+	$(CC) $(CFLAGS) -c $<
+
+$(LIBDIR)\rename$(O) .SETDIR=$(LIBDIR): rename$(C)
+	$(CC) $(CFLAGS) -c $<
+
+$(LIBDIR)\safeio$(O) .SETDIR=$(LIBDIR): safeio$(C)
+	$(CC) $(CFLAGS) -c $<
+
+$(LIBDIR)\safeout$(O) .SETDIR=$(LIBDIR): safeout$(C)
+	$(CC) $(CFLAGS) -c $<
+
+$(LIBDIR)\scrsize2$(O) .SETDIR=$(LIBDIR): scrsize2$(C)
+	$(CC) $(CFLAGS) -c $<
+
+$(LIBDIR)\security$(O) .SETDIR=$(LIBDIR): security$(C)
+	$(CC) $(CFLAGS) -c $<
+
+$(LIBDIR)\ssleep$(O) .SETDIR=$(LIBDIR): ssleep$(C)
+	$(CC) $(CFLAGS) -c $<
+
+$(LIBDIR)\stater$(O) .SETDIR=$(LIBDIR): stater$(C)
+	$(CC) $(CFLAGS) -c $<
+
+$(LIBDIR)\strlwr$(O) .SETDIR=$(LIBDIR): strlwr$(C)
+	$(CC) $(CFLAGS) -c $<
+
+$(LIBDIR)\strpool$(O) .SETDIR=$(LIBDIR): strpool$(C)
+	$(CC) $(CFLAGS) -c $<
+
+$(LIBDIR)\timestmp$(O) .SETDIR=$(LIBDIR): timestmp$(C)
+	$(CC) $(CFLAGS) -c $<
+
+$(LIBDIR)\title2$(O) .SETDIR=$(LIBDIR): title2$(C)
+	$(CC) $(CFLAGS) -c $<
+
+$(LIBDIR)\usertabl$(O) .SETDIR=$(LIBDIR): usertabl$(C)
+	$(CC) $(CFLAGS) -c $<
+
+$(LIBDIR)\usrcatch$(O) .SETDIR=$(LIBDIR): usrcatch$(C)
+	$(CC) $(CFLAGS) -c $<
+
+$(LIBDIR)\validcmd$(O) .SETDIR=$(LIBDIR): validcmd$(C)
+	$(CC) $(CFLAGS) -c $<
+
+$(NEWSDIR)\active$(O) .SETDIR=$(NEWSDIR): active$(C)
+	@echo Directory is now $(PWD)
+	$(CC) $(CFLAGS) -c $<
+
+$(NEWSDIR)\history$(O) .SETDIR=$(NEWSDIR): history$(C)
+	$(CC) $(CFLAGS) -c $<
+
+$(NEWSDIR)\importng$(O) .SETDIR=$(NEWSDIR): importng$(C)
+	$(CC) $(CFLAGS) -c $<
+
+$(NEWSDIR)\hdbm$(O) .SETDIR=$(NEWSDIR): hdbm$(C)
+	$(CC) $(CFLAGS) -c $<
+
+$(NEWSDIR)\idx$(O) .SETDIR=$(NEWSDIR): idx$(C)
+	$(CC) $(CFLAGS) -c $<
+
+$(NEWSDIR)\cache$(O) .SETDIR=$(NEWSDIR): cache$(C)
+	$(CC) $(CFLAGS) -c $<
+
+#The main programs
+dbz$(C): ..\$(LIBDIR)\uupcmoah$(H) active$(H) ..\$(LIBDIR)\dater$(H) \
+	history$(H) ..\$(LIBDIR)\import$(H) \
+	importng$(H) ..\$(LIBDIR)\logger$(H) ..\$(LIBDIR)\uundir$(H) \
+	..\$(LIBDIR)\pushpop$(H) ..\$(LIBDIR)\stater$(H) ..\$(LIBDIR)\timestmp$(H) \
+	hdbm$(H) dbz$(H)
+
+expire$(C): ..\$(LIBDIR)\uupcmoah$(H) active$(H) ..\$(LIBDIR)\dater$(H) \
+	history$(H) ..\$(LIBDIR)\import$(H) \
+	importng$(H) ..\$(LIBDIR)\logger$(H) ..\$(LIBDIR)\uundir$(H) \
+	..\$(LIBDIR)\pushpop$(H) ..\$(LIBDIR)\stater$(H) ..\$(LIBDIR)\timestmp$(H) \
+	hdbm$(H)
+
+# Lib dir
+abspath$(C): uupcmoah$(H)
+
+arbmath$(C): uupcmoah$(H) arbmath$(H)
+
+arpadate$(C): uupcmoah$(H) arpadate$(H)
+
+bugout$(C): uupcmoah$(H) catcher$(H) timestmp$(H) winutil$(H)
+
+catcher$(C): uupcmoah$(H) timestmp$(H) catcher$(H) safeio$(H) \
+	winutil$(H)
+
+chdir$(C): uupcmoah$(H)
+
+checkptr$(C): uupcmoah$(H)
+
+configur$(C): uupcmoah$(H) timestmp$(H) pushpop$(H) pnterr$(H)
+
+dater$(C): uupcmoah$(H) dater$(H)
+
+dos2unix$(C): uupcmoah$(H) dos2unix$(H)
+
+execute$(C): uupcmoah$(H) execute$(H) title$(H) winutil$(H) pnterr$(H) \
+	pos2err$(H)
+
+expath$(C): uupcmoah$(H) expath$(H) hostable$(H) security$(H) usertabl$(H) \
+	pushpop$(H)
+
+export$(C): uupcmoah$(H) arbmath$(H) export$(H) import$(H) usertabl$(H) \
+	hostable$(H) security$(H)
+
+filebkup$(C): uupcmoah$(H)
+
+fopen$(C): uupcmoah$(H) ssleep$(H)
+
+getargs$(C): uupcmoah$(H)
+
+getdrive$(C): uupcmoah$(H)
+
+getseq$(C): uupcmoah$(H) getseq$(H)
+
+hostable$(C): uupcmoah$(H) hostable$(H) security$(H)
+
+hostatus$(C): uupcmoah$(H) hostable$(H) hostatus$(H) security$(H) \
+	timestmp$(H) stater$(H)
+
+hostrset$(C): uupcmoah$(H) hostable$(H) hostatus$(H) hostrset$(H) \
+	security$(H) timestmp$(H)
+
+imfile$(C): uupcmoah$(H) imfile$(H) execute$(H)
+
+import$(C): uupcmoah$(H) pos2err$(H) import$(H) arbmath$(H) hostable$(H) \
+	usertabl$(H) security$(H) pnterr$(H)
+
+kanjicnv$(C): uupcmoah$(H) kanjicnv$(H)
+
+lock$(C): uupcmoah$(H) dater$(H) stater$(H) lock$(H) import$(H)
+
+logger$(C): uupcmoah$(H) dater$(H) expath$(H) logger$(H) timestmp$(H)
+
+mkdir$(C): uupcmoah$(H)
+
+mkfilenm$(C): uupcmoah$(H)
+
+mkmbox$(C): uupcmoah$(H)
+
+mktempnm$(C): uupcmoah$(H)
+
+ndiros2$(C): uupcmoah$(H) uundir$(H) dos2unix$(H)
+
+normaliz$(C): uupcmoah$(H)
+
+pos2err$(C): uupcmoah$(H) pos2err$(H)
+
+printerr$(C): uupcmoah$(H)
+
+printmsg$(C): uupcmoah$(H) dater$(H) logger$(H)
+
+pushpop$(C): uupcmoah$(H) pushpop$(H)
+
+readnext$(C): uupcmoah$(H) readnext$(H) uundir$(H) hostable$(H) security$(H)
+
+remove2$(C): uupcmoah$(H) pos2err$(H)
+
+rename$(C): uupcmoah$(H)
+
+safeio$(C): uupcmoah$(H) safeio$(H)
+
+safeout$(C): uupcmoah$(H) safeio$(H)
+
+scrsize2$(C): uupcmoah$(H) scrsize$(H)
+
+security$(C): uupcmoah$(H) hostable$(H) security$(H) usertabl$(H) expath$(H)
+
+ssleep$(C): uupcmoah$(H) ssleep$(H) winutil$(H) pos2err$(H) safeio$(H) \
+	catcher$(H)
+
+stater$(C): uupcmoah$(H)
+
+strlwr$(C): uupcmoah$(H)
+
+strpool$(C): uupcmoah$(H)
+
+timestmp$(C): uupcmoah$(H) timestmp$(H) win32ver$(H) winutil$(H) ssleep$(H) \
+	title$(H)
+
+title2$(C): uupcmoah$(H) timestmp$(H) title$(H)
+
+usertabl$(C): uupcmoah$(H) expath$(H) usertabl$(H) hostable$(H) security$(H) \
+	pushpop$(H)
+
+usrcatch$(C): uupcmoah$(H) timestmp$(H) usrcatch$(H)
+
+validcmd$(C): uupcmoah$(H) hostable$(H) security$(H) usertabl$(H) expath$(H)
+
+#News dir
+active$(C): ..\$(LIBDIR)\uupcmoah$(H) active$(H)
+
+batch$(C): ..\$(LIBDIR)\uupcmoah$(H) ..\$(LIBDIR)\timestmp$(H) \
+	..\$(LIBDIR)\import$(H) ..\$(LIBDIR)\getseq$(H) batch$(H) \
+	..\$(LIBDIR)\execute$(H) ..\$(LIBDIR)\imfile$(H) \
+	..\$(LIBDIR)\stater$(H) ..\$(LIBDIR)\sys$(H)
+
+cache$(C): ..\$(LIBDIR)\uupcmoah$(H) cache$(H)
+
+genhist$(C): ..\$(LIBDIR)\uupcmoah$(H) active$(H) \
+	..\$(LIBDIR)\dater$(H)	\
+	history$(H) ..\$(LIBDIR)\import$(H) importng$(H) \
+	..\$(LIBDIR)\logger$(H) ..\$(LIBDIR)\uundir$(H) \
+	..\$(LIBDIR)\pushpop$(H) ..\$(LIBDIR)\stater$(H) \
+	..\$(LIBDIR)\timestmp$(H) hdbm$(H)
+
+hdbm$(C): ..\$(LIBDIR)\uupcmoah$(H) hdbm$(H) \
+	idx$(H)
+
+history$(C): ..\$(LIBDIR)\uupcmoah$(H) \
+	..\$(LIBDIR)\timestmp$(H) active$(H) history$(H) \
+	importng$(H) hdbm$(H)
+
+idx$(C): ..\$(LIBDIR)\uupcmoah$(H) \
+	idx$(H) cache$(H)
+
+importng$(C): ..\$(LIBDIR)\uupcmoah$(H) \
+	..\$(LIBDIR)\import$(H) importng$(H)
+
+inews$(C): ..\$(LIBDIR)\uupcmoah$(H) \
+	 ..\$(LIBDIR)\getseq$(H) \
+	..\$(LIBDIR)\import$(H) ..\$(LIBDIR)\logger$(H) \
+	..\$(LIBDIR)\timestmp$(H) ..\$(LIBDIR)\execute$(H) \
+	..\$(LIBDIR)\arpadate$(H) ..\$(LIBDIR)\hostable$(H)
+
+newsrun$(C): ..\$(LIBDIR)\uupcmoah$(H) active$(H) \
+	..\$(LIBDIR)\getseq$(H) \
+	history$(H) ..\$(LIBDIR)\hostable$(H) \
+	..\$(LIBDIR)\import$(H) ..\$(LIBDIR)\imfile$(H) \
+	importng$(H) ..\$(LIBDIR)\logger$(H) \
+	..\$(LIBDIR)\timestmp$(H) ..\$(LIBDIR)\stater$(H) \
+	..\$(LIBDIR)\execute$(H) ..\$(LIBDIR)\batch$(H) sys$(H)
+
+rnews$(C): ..\$(LIBDIR)\uupcmoah$(H) \
+	..\$(LIBDIR)\logger$(H) \
+	..\$(LIBDIR)\timestmp$(H) ..\$(LIBDIR)\getseq$(H) \
+	..\$(LIBDIR)\execute$(H)
+
+sendbats$(C): ..\$(LIBDIR)\uupcmoah$(H) active$(H) \
+	..\$(LIBDIR)\getseq$(H) \
+	history$(H) ..\$(LIBDIR)\import$(H) importng$(H) \
+	..\$(LIBDIR)\logger$(H) ..\$(LIBDIR)\timestmp$(H) \
+	..\$(LIBDIR)\title$(H) batch$(H) sys$(H)
+
+sys$(C): ..\$(LIBDIR)\uupcmoah$(H) \
+	..\$(LIBDIR)\timestmp$(H) active$(H) \
+	..\$(LIBDIR)\hostable$(H) sys$(H) \
+	..\$(LIBDIR)\stater$(H) ..\$(LIBDIR)\arpadate$(H)
+
+clean:
+	-rm ./news/*$(O)
+	-rm ./lib/*$(O)
+	-rm *.exe
+	-rm -rf *~
+	-rm core
+	-rm \#*
+
+package: clean all
+	-rm *.zip
+	zip UUDBZ003 README
+	zip UUDBZ003 Install.doc
+	zip UUDBZ003 Makefile.dbz
+	zip UUDBZ003 dbz.exe
+	zip UUDBZ003 expire.exe
+	zip UUDBZ003 *.cmd
+	zip UUDBZ003 upload.ann
+	zip UUDBZ003 Change.log
+	zip -r UUDBZ003 . -i *.diff
+	zip UUDBZ003 news\dbz.c
+	zip UUDBZ003 news\dbz.h
+	cp dbz.exe g:/uucp/os2bin
+	cp expire.exe g:/uucp/os2bin

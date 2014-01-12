@@ -1,0 +1,203 @@
+This is the installation documentation for the Mome Raths BBS package
+dbz for UUPC/Extended.  This package is not part of the UUPC
+distribution, but is based upon their work.  UUPC/Extended is
+copyrighted, trademarked software, and every effort has been made to not
+knowingly infringe upon either one.
+
+However, the dbz.c and dbz.h that are in this distribution are original
+works.  It has been made public domain by myself, the author.
+
+The patched expire.exe, however, is a copyrighted program, covered
+by the UUPC/Extended copyright.  The diff files contain all of the
+necessary entries, should you wish to recompile it yourself (assuming
+that you are using emx, at any rate).
+
+Please read the README file for a more thorough explanation of what dbz
+is, why it is public domain and what it is used for.
+
+
+Unpacking:
+
+I suggest that you make a copy of your UUPC source files, if you wish to
+recompile it, and use the copy rather than the originals.  Unzip this
+file into your new source directory (assuming SOURCE for the following
+examples and explanations).  Files will be put into the SOURCE\NEWS 
+and SOURCE\LIB directories as well as into SOURCE itself.
+
+If you do not wish to recompile, you may unzip into a temporary
+directory, then move the executables to your OS2BIN directory, or
+some other directory in your path.
+
+Once you unzip the package, these are the files you should have:
+
+README -- explains the prerequisites, what dbz is, what it is used for,
+what NoCEM is, why dbz is but isn't public domain and why I wrote it.
+
+Install.doc -- this file, tells you how to install and use dbz.  How it
+may differ from other dbz programs.  How to recompile it using emx.
+
+Change.log -- A list of changes made to the package.
+
+Makefile.dbz -- for using dmake to recompile dbz.
+
+dbz.exe -- a compiled executable, ready-to-go.
+
+expire.exe -- a patched replacement for UUPC's expire program.
+The original 1.12s version almost always seemed to crash by
+attempting to delete nonexistent files.  Note that if you are
+running dbz.exe for NoCEM on spool, you will have deleted files.
+
+dbzMake.Cmd -- a REXX script that sets up the correct paths to compile
+dbz.
+
+dbz_mksetup.cmd -- a supporting REXX script called by dbzMake.Cmd, if
+necessary.  If the path has already been setup, then this does not get 
+called.
+
+patchme.cmd -- a rather brainless batch file that can be used to patch 
+the sources.
+
+testDBZ.Cmd -- a batch file used to test dbz errorlevel returns.
+
+lib/lib.diff -- diff file for library files.
+
+news/news.diff -- diff file for news files.
+
+news/dbz.c -- source file for dbz executable.
+
+news/dbz.h -- header file for dbz.
+
+
+Installation:
+
+The binaries will come out at the root of the directory where you unzipped
+this package.  Move the binary into the \UUPC\OS2BIN directory.  If you
+wish to keep the documentation, move them into \UUCP\DOCS.  I suggest 
+renaming them to avoid potential naming conflicts.
+
+If you have your spool directory in an odd place, check UUPC.RC to make
+sure that the spool directory is specified.  However, it is unlikely
+that anything would work if it were incorrect.
+
+That's basically it.  Now, test to make sure it is working correctly.
+
+
+Testing the installation:
+
+To test, open an OS/2 window, and type:
+	dbz
+
+It will give you an error that you typed it without parameters.  Now, try:
+	dbz -x "<1234>"
+
+Note the quotes!  Without the quotes, it will interpret the '<' and '>'
+characters as redirection symbols.
+
+The above command should not have given you any output.  Now, try:
+	dbz -m "<1234>"
+
+It should spit <1234> back out at you.
+
+If you have the GNU file utilities installed, try:
+	head g:\uucp\news\history.pag {or, wherever you have news installed}
+
+You should get some somewhat human-readable stuff on the screen.  Using
+the handy OS/2 Warp window functions, find one between the '<' and '>'
+characters on one line, then click and hold the left mouse button down
+on the '<' character, drag it to the '>' character, and then let go. 
+Now, you should have the section you want highlighted on the screen. 
+Next, click on the highlighted section with the right mouse button, and
+a popup menu appears.  Choose "copy" from the menu, and the highlighting
+goes away.  Now, type:
+	dbz -x "
+
+Next, press and release the [Alt] key, then press the [P] key.  The text
+will be pasted into the line.  Lastly, press ["] to finish the quote, so
+that the line looks simiar to:
+	dbz -x "<A0000009.$cv@penguin.com>"
+
+Now, press return.  You should get something like:
+	<A0000009.$cv@penguin.com> 869834698 1388 news.software.readers:365
+
+If you can see both, then compare to make sure that they are the same. 
+If not, something is definitely wrong.  Run expire and then genhist,
+then try again.  If the problem continues, do not use this program any
+further.  Do copy the entire screen to a file, send it and
+\UUPC\SPOOL\DBZ.LOG via email to MarchHare@momeraths.org.
+
+
+Differences:
+
+I can only guess what the output of dbz on an actual C-News feed looks
+like.  However, from what I do know, there are some differences.  The 
+quotes being required around the key are the biggest and most important
+difference.  This version of dbz has been altered to output the key and 
+data, instead of just the data.  This was done to make it easier to work
+with NoCEM or NoCEM on spool.  It will also return an errorlevel of 1 if
+it could not add/find existing/find missing the database key input.
+
+Not all functions are implemented, as I saw very little need.  You can
+append a record, extract (see) a record or extract (see) a missing
+record.  You cannot delete or modify a record (note that the original
+C-News dbz does not delete records either).  Apparently, the UUPC
+routines do not modify records, either, so it would have taken a
+rather large effort for little return.  In any event NoCEM will only do
+those three functions, so they were the only ones implemented.
+
+Another difference is that there is no provision for specifying the
+filename.  Since this is a narrowly targetted program, again, I did not
+see the need.  It also would have required a little more rewriting of
+various routines, and I wanted to change the actual UUPC source code as
+little as possible.  It could be done easily enough, however, by calling
+the functions directly, rather than going through open_history() and
+close_history().
+
+
+Recompiling:
+
+The following instructions assume the emx development environment, and
+the prerequisites in the README.  If you are using a different compiler,
+follow the appropriate instructions for it.  The diff files are for
+emx/gcc.  UUPC is currently compiled with IBM's C-Set (as far as I
+know), so very little modification should be necessary (expire being
+the obvious example).
+
+In general, I tried to make the Makefile as general purpose as possible. 
+It should make all of the applicable UUPC libraries, but you will need 
+to add files that are specific to another executable. It should save
+anyone some work, at least.  To compile the entire UUPC package under
+emx/gcc would still take some work.
+
+Follow the installation instructions above, unzipping the package into a
+copy of the source.
+
+Next, you want to patch the source code for compiling under emx, using
+GNU's patch program.  The latest one is named "patchos2.exe".  I 
+apologize for the size of the diffs, but whenever I tried using -b, it
+would fail a lot.  So, I supplied the unified diffs without spacing 
+considerations.
+
+I put a batch file in the package that can be used to run patchos2, if 
+you so desire.  I created it simply because I got tired of typing. 
+Otherwise, the following manual procedures will do the exact same thing.
+
+Open an OS/2 command window, change into the LIB directory, then type:
+	patchos2 <lib.diff
+
+Next, change into the NEWS directory, then type:
+	patchos2 <news.diff
+
+Open an OS/2 command window and change to the directory you setup (if 
+you are not already there).  Don't attempt to run it from an editor's
+command environment, unless you can specify the REXX program to call
+(which would probably require changes to your menu, and probably not
+worth it).
+
+Now, run:
+	dbzmake
+
+*Everything* should make and be fine.  Unfortunately, it will build
+*everything* *every* time.  If you are adventurous, you can try to
+disable the RCS information and recompile.  Sorry, not my code, nothing
+I can really do about it except point you in the right direction or
+providing very large diff files (and chance breaking something).
